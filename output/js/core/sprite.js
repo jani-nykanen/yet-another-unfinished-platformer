@@ -1,0 +1,77 @@
+import { Flip } from "./canvas.js";
+export class Sprite {
+    constructor(w, h) {
+        this.getRow = () => this.row;
+        this.getColumn = () => this.column;
+        this.getTimer = () => this.timer;
+        this.width = w;
+        this.height = h;
+        this.row = 0;
+        this.column = 0;
+        this.timer = 0.0;
+    }
+    animate(row, start, end, speed, steps = 1.0) {
+        row |= 0;
+        start |= 0;
+        end |= 0;
+        speed |= 0;
+        if (start == end) {
+            this.timer = 0;
+            this.column = start;
+            this.row = row;
+            return;
+        }
+        if (this.row != row) {
+            this.timer = 0;
+            this.column = end > start ? start : end;
+            this.row = row;
+        }
+        if ((start < end && this.column < start) ||
+            (start > end && this.column > start)) {
+            this.column = start;
+        }
+        this.timer += steps;
+        if (this.timer > speed) {
+            // Loop the animation, if end reached
+            if (start < end) {
+                if (++this.column > end) {
+                    this.column = start;
+                }
+            }
+            else {
+                if (--this.column < end) {
+                    this.column = start;
+                }
+            }
+            this.timer -= speed;
+        }
+    }
+    setFrame(column, row, preserveTimer = false) {
+        this.column = column;
+        this.row = row;
+        if (!preserveTimer)
+            this.timer = 0;
+    }
+    drawScaledFrame(c, bmp, column, row, dx, dy, dw, dh, flip = Flip.None) {
+        /*
+            c.drawScaledBitmapRegion(bmp,
+                this.width * column, this.height * row,
+                this.width, this.height,
+                dx, dy, dw, dh, flip);
+            */
+    }
+    drawFrame(c, bmp, column, row, dx, dy, flip = Flip.None) {
+        /*
+        c.drawBitmapRegion(bmp,
+            this.width * column, this.height * row,
+            this.width, this.height,
+            dx, dy, flip);
+        */
+    }
+    draw(c, bmp, dx, dy, flip = Flip.None) {
+        this.drawFrame(c, bmp, this.column, this.row, dx, dy, flip);
+    }
+    drawScaled(c, bmp, dx, dy, dw, dh, flip = Flip.None) {
+        this.drawScaledFrame(c, bmp, this.column, this.row, dx, dy, dw, dh, flip);
+    }
+}
