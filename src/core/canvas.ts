@@ -26,6 +26,7 @@ export class Canvas {
     private glCtx : WebGLRenderingContext;
 
     private defaultShader : Shader;
+    private untexturedShader : Shader;
     private activeShader : Shader;
 
     private rectangle : Mesh;
@@ -48,6 +49,8 @@ export class Canvas {
         window.addEventListener("resize", () => this.resize(
             window.innerWidth, window.innerHeight));
 
+        this.untexturedShader = new Shader(
+            this.glCtx, VertexSource.NoTexture, FragmentSource.NoTexture);
         this.defaultShader = new Shader(
             this.glCtx, VertexSource.Default, FragmentSource.Default);
         this.defaultShader.use();
@@ -179,12 +182,48 @@ export class Canvas {
     }
 
 
+    public resetVertexAndFragmentTransforms() {
+
+        this.activeShader.setVertexTransform(0, 0, 1, 1);
+        this.activeShader.setFragTransform(0, 0, 1, 1);
+    }
+
+
+    public toggleTexturing(state = true) {
+
+        let newShader = state ? this.defaultShader : this.untexturedShader;
+
+        if (newShader == this.activeShader) return;
+
+        this.activeShader = newShader;
+        this.activeShader.use();
+
+        this.transform.setActiveShader(this.activeShader);
+        this.transform.use();
+    }
+
+
+    public setDrawColor(r = 1, g = 1, b = 1, a = 1) {
+
+        this.activeShader.setColor(r, g, b, a);
+    }
+
+
     public drawRectangle(x : number, y : number, w : number, h : number) {
 
         this.activeShader.setVertexTransform(x, y, w, h);
 
         this.bindMesh(this.rectangle);
         this.activeMesh.draw(this.glCtx);
+    }
+
+
+
+    public drawBitmap(bmp : Bitmap, 
+        dx : number, dy : number, dw = bmp.width, dh = bmp.height) {
+
+        this.drawBitmapRegion(bmp, 0, 0, bmp.width, bmp.height,
+            dx, dy, dw, dh);
     }
 
 

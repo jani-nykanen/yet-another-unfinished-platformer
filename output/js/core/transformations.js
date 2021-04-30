@@ -14,6 +14,9 @@ export class Transformations {
         this.product = Matrix3.multiply(this.view, this.model);
         this.productComputed = true;
     }
+    setActiveShader(shader) {
+        this.activeShader = shader;
+    }
     loadIdentity() {
         this.model = Matrix3.identity();
         this.productComputed = false;
@@ -41,7 +44,7 @@ export class Transformations {
         this.model = this.modelStack.pop();
         this.productComputed = false;
     }
-    useTransform() {
+    use() {
         this.computeProduct();
         this.activeShader.setTransformMatrix(this.product);
     }

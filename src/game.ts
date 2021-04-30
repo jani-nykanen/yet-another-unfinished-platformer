@@ -23,8 +23,14 @@ export class GameScene implements Scene {
 
         canvas.transform.loadIdentity();
         canvas.transform.setView(canvas.width, canvas.height);
-        canvas.transform.useTransform();
+        canvas.transform.use();
 
+        canvas.toggleTexturing(false);
+        canvas.setDrawColor(1, 0, 0, 1);
+        canvas.drawRectangle(128, 128, 256, 256);
+
+        canvas.toggleTexturing();
+        canvas.setDrawColor();
         canvas.drawText(canvas.getBitmap("font"),
             "HELLO WORLD!", 16, 16, -26, 0);
     }

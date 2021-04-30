@@ -1,3 +1,4 @@
+import { Bitmap } from "./bitmap.js";
 import { Canvas, Flip } from "./canvas.js";
 
 
@@ -86,50 +87,25 @@ export class Sprite {
     }
 
 
-    public drawScaledFrame(c : Canvas, bmp : HTMLImageElement, 
+    public drawFrame(canvas : Canvas, bmp : Bitmap, 
         column : number, row : number, 
-        dx : number, dy : number, dw : number, dh : number,
-        flip = Flip.None) {
-    /*
-        c.drawScaledBitmapRegion(bmp, 
-            this.width * column, this.height * row, 
-            this.width, this.height, 
-            dx, dy, dw, dh, flip);
-        */
-    }
-
-
-    public drawFrame(c : Canvas, bmp : HTMLImageElement, 
-        column : number, row : number, 
-        dx : number, dy : number, flip = Flip.None) {
+        dx : number, dy : number, dw = this.width, dh = this.height) {
             
-        /*
-        c.drawBitmapRegion(bmp, 
+        canvas.drawBitmapRegion(bmp, 
             this.width * column, this.height * row, 
             this.width, this.height, 
-            dx, dy, flip);
-        */
+            dx, dy, dw, dh);
+        
     }
 
 
-    public draw(c : Canvas, bmp : HTMLImageElement, 
+    public draw(canvas : Canvas, bmp : Bitmap, 
         dx : number, dy : number, flip = Flip.None) {
 
-        this.drawFrame(c, bmp, 
+        this.drawFrame(canvas, bmp, 
             this.column, this.row,
             dx, dy, flip);
     }
-
-
-    public drawScaled(c : Canvas, bmp : HTMLImageElement, 
-        dx : number, dy : number, dw : number, dh : number,
-        flip = Flip.None) {
-
-        this.drawScaledFrame(c, bmp, 
-            this.column, this.row,
-            dx, dy, dw, dh, flip);
-    }
-
 
 
     public getRow = () => this.row;

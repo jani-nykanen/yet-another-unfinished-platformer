@@ -19,6 +19,21 @@ void main() {
     gl_Position = vec4(transform * vec3(vertexPos * size + pos, 1), 1);
     uv = vertexUV;
 }`,
+
+NoTexture : 
+    
+`
+attribute vec2 vertexPos;
+attribute vec2 vertexUV;
+
+uniform mat3 transform;
+uniform vec2 pos;
+uniform vec2 size;
+
+void main() {
+
+    gl_Position = vec4(transform * vec3(vertexPos * size + pos, 1), 1);
+}`,
 }
 
 
@@ -48,5 +63,19 @@ void main() {
     // }
 
     gl_FragColor = res;
+}`,
+
+
+
+NoTexture : 
+
+`
+precision mediump float;
+
+uniform vec4 color;
+
+void main() {
+
+    gl_FragColor = color;
 }`,
 }

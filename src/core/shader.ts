@@ -99,6 +99,7 @@ export class Shader {
         let gl = this.gl;
     
         gl.useProgram(this.shaderProgram);
+        this.getUniformLocations();
 
         gl.uniform1i(this.uniformTextureSampler, 0);
         this.setVertexTransform(0, 0, 1, 1);

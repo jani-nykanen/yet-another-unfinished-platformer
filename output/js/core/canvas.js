@@ -19,6 +19,7 @@ export class Canvas {
         this.createHtml5Canvas(width, height);
         this.initOpenGL();
         window.addEventListener("resize", () => this.resize(window.innerWidth, window.innerHeight));
+        this.untexturedShader = new Shader(this.glCtx, VertexSource.NoTexture, FragmentSource.NoTexture);
         this.defaultShader = new Shader(this.glCtx, VertexSource.Default, FragmentSource.Default);
         this.defaultShader.use();
         this.activeShader = this.defaultShader;
@@ -96,6 +97,22 @@ export class Canvas {
             return;
         bmp.bind(this.glCtx);
         this.activeTexture = bmp;
+    }
+    resetVertexAndFragmentTransforms() {
+        this.activeShader.setVertexTransform(0, 0, 1, 1);
+        this.activeShader.setFragTransform(0, 0, 1, 1);
+    }
+    toggleTexturing(state = true) {
+        let newShader = state ? this.defaultShader : this.untexturedShader;
+        if (newShader == this.activeShader)
+            return;
+        this.activeShader = newShader;
+        this.activeShader.use();
+        this.transform.setActiveShader(this.activeShader);
+        this.transform.use();
+    }
+    setDrawColor(r = 1, g = 1, b = 1, a = 1) {
+        this.activeShader.setColor(r, g, b, a);
     }
     drawRectangle(x, y, w, h) {
         this.activeShader.setVertexTransform(x, y, w, h);

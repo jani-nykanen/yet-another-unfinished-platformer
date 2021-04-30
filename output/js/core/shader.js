@@ -48,6 +48,7 @@ export class Shader {
     use() {
         let gl = this.gl;
         gl.useProgram(this.shaderProgram);
+        this.getUniformLocations();
         gl.uniform1i(this.uniformTextureSampler, 0);
         this.setVertexTransform(0, 0, 1, 1);
         this.setFragTransform(0, 0, 1, 1);

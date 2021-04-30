@@ -37,6 +37,12 @@ export class Transformations {
     }
 
 
+    public setActiveShader(shader : Shader) {
+
+        this.activeShader = shader;
+    }
+
+
     public loadIdentity() {
 
         this.model = Matrix3.identity();
@@ -91,7 +97,7 @@ export class Transformations {
     }
 
 
-    public useTransform() {
+    public use() {
 
         this.computeProduct();
         this.activeShader.setTransformMatrix(this.product);
