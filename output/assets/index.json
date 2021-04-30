@@ -8,5 +8,11 @@
     "samplePath" : "assets/samples/",
     "samples" : [
 
+    ],
+
+    "tilemapPath" : "assets/tilemaps/",
+    "tilemaps" : [
+
+        {"name": "map1",  "path": "1.tmx"}
     ]
 }

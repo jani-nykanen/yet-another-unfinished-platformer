@@ -6,7 +6,6 @@ export var TransitionEffectType;
     TransitionEffectType[TransitionEffectType["CirleIn"] = 2] = "CirleIn";
     TransitionEffectType[TransitionEffectType["BoxVertical"] = 3] = "BoxVertical";
     TransitionEffectType[TransitionEffectType["BoxHorizontal"] = 4] = "BoxHorizontal";
-    // SomethingAmazing = 256,
 })(TransitionEffectType || (TransitionEffectType = {}));
 export class TransitionEffectManager {
     constructor() {
@@ -49,50 +48,20 @@ export class TransitionEffectManager {
             }
         }
     }
-    draw(c) {
+    draw(canvas) {
         if (!this.active || this.effectType == TransitionEffectType.None)
             return;
-        /*
-                c.moveTo();
-        
-                let t = this.timer;
-                if (this.fadeIn)
-                    t = 1.0 - t;
-        
-                let maxRadius : number;
-                let radius : number;
-        
-                switch (this.effectType) {
-        
-                case TransitionEffectType.Fade:
-        
-                    c.setFillColor(this.color.r, this.color.g, this.color.b, this.color.a);
-        
-                    c.setGlobalAlpha(t);
-                    c.fillRect(0, 0, c.width, c.height);
-                    c.setGlobalAlpha();
-        
-                    break;
-        
-                case TransitionEffectType.CirleIn:
-        
-                    maxRadius = Math.max(
-                        Math.hypot(this.center.x, this.center.y),
-                        Math.hypot(c.width - this.center.x, this.center.y),
-                        Math.hypot(c.width - this.center.x, c.height - this.center.y),
-                        Math.hypot(this.center.x, c.height - this.center.y)
-                    );
-        
-                    radius = (1 - t) * maxRadius;
-        
-                    c.setFillColor(this.color.r, this.color.g, this.color.b, this.color.a);
-                    c.fillCircleOutside(radius, this.center.x, this.center.y);
-        
-                    break;
-        
-                default:
-                    break;
-                }
-            */
+        let t = this.timer;
+        if (this.fadeIn)
+            t = 1.0 - t;
+        switch (this.effectType) {
+            case TransitionEffectType.Fade:
+                canvas.toggleTexturing(false);
+                canvas.setDrawColor(this.color.r, this.color.g, this.color.b, this.color.a * t);
+                canvas.drawRectangle(0, 0, canvas.width, canvas.height);
+                break;
+            default:
+                break;
+        }
     }
 }

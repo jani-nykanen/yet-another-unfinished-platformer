@@ -10,6 +10,7 @@ export class FrameState {
         this.upPress = () => this.input.upPress();
         this.downPress = () => this.input.downPress();
         this.getSample = (name) => this.assets.getSample(name);
+        this.getTilemap = (name) => this.assets.getTilemap(name);
         this.core = core;
         this.step = step;
         this.input = input;
@@ -50,29 +51,25 @@ export class Core {
         const BAR_BORDER_WIDTH = 1;
         let barWidth = canvas.width / 4;
         let barHeight = barWidth / 8;
-        /*
-                c.clear(0, 0, 0);
-            
-                let t = this.assets.dataLoadedUnit();
-                let x = c.width/2 - barWidth/2;
-                let y = c.height/2 - barHeight/2;
-        
-                x |= 0;
-                y |= 0;
-            
-                // Outlines
-                c.setFillColor(255);
-                c.fillRect(x-BAR_BORDER_WIDTH*2, y-BAR_BORDER_WIDTH*2,
-                    barWidth+BAR_BORDER_WIDTH*4, barHeight+BAR_BORDER_WIDTH*4);
-                c.setFillColor(0);
-                c.fillRect(x-BAR_BORDER_WIDTH, y-BAR_BORDER_WIDTH,
-                    barWidth+BAR_BORDER_WIDTH*2, barHeight+BAR_BORDER_WIDTH*2);
-            
-                // Bar
-                let w = (barWidth*t) | 0;
-                c.setFillColor(255);
-                c.fillRect(x, y, w, barHeight);
-                */
+        canvas.clear(0, 0, 0);
+        canvas.toggleTexturing(false);
+        canvas.transform.loadIdentity();
+        canvas.transform.setView(canvas.width, canvas.height);
+        canvas.transform.use();
+        let t = this.assets.dataLoadedUnit();
+        let x = canvas.width / 2 - barWidth / 2;
+        let y = canvas.height / 2 - barHeight / 2;
+        x |= 0;
+        y |= 0;
+        // Outlines
+        canvas.setDrawColor();
+        canvas.drawRectangle(x - BAR_BORDER_WIDTH * 2, y - BAR_BORDER_WIDTH * 2, barWidth + BAR_BORDER_WIDTH * 4, barHeight + BAR_BORDER_WIDTH * 4);
+        canvas.setDrawColor(0, 0, 0);
+        canvas.drawRectangle(x - BAR_BORDER_WIDTH, y - BAR_BORDER_WIDTH, barWidth + BAR_BORDER_WIDTH * 2, barHeight + BAR_BORDER_WIDTH * 2);
+        // Bar
+        let w = (barWidth * t) | 0;
+        canvas.setDrawColor(255);
+        canvas.drawRectangle(x, y, w, barHeight);
     }
     loop(ts) {
         const MAX_REFRESH_COUNT = 5;

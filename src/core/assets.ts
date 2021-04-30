@@ -2,6 +2,7 @@ import { AudioPlayer } from "./audioplayer.js";
 import { Bitmap } from "./bitmap.js";
 import { Canvas } from "./canvas.js";
 import { AudioSample } from "./sample.js";
+import { Tilemap } from "./tilemap.js";
 import { KeyValuePair } from "./types.js";
 
 
@@ -42,9 +43,11 @@ export class AssetManager {
 
     private bitmaps : AssetContainer<Bitmap>;
     private samples : AssetContainer<AudioSample>;
+    private tilemaps : AssetContainer<Tilemap>;
     private loaded : number;
     private total : number;
     
+
     private readonly audio : AudioPlayer;
     // We would want this to be readonly, but since
     // canvas has a reference to asset manager, asset 
@@ -56,6 +59,7 @@ export class AssetManager {
 
         this.bitmaps = new AssetContainer<Bitmap> ();
         this.samples = new AssetContainer<AudioSample> ();
+        this.tilemaps = new AssetContainer<Tilemap> ();
 
         this.total = 0;
         this.loaded = 0;
@@ -63,7 +67,6 @@ export class AssetManager {
         this.audio = audio;
     }
 
-    
 
     private loadTextfile(path : string, type : string, cb : (s : string) => void) {
         
@@ -131,6 +134,18 @@ export class AssetManager {
     }
 
 
+    public loadTilemap(name : string, url : string) {
+
+        ++ this.total;
+        
+        this.loadTextfile(url, "xml", (str : string) => {
+
+            this.tilemaps.addAsset(name, new Tilemap(str));
+            ++ this.loaded;
+        });
+    }
+
+
     public parseAssetIndexFile(url : string) {
 
         this.loadTextfile(url, "json", (s : string) => {
@@ -146,6 +161,12 @@ export class AssetManager {
             for (let o of data["samples"]) {
 
                 this.loadSample(o["name"], path + o["path"]);
+            }
+
+            path = data["tilemapPath"];
+            for (let o of data["tilemaps"]) {
+
+                this.loadTilemap(o["name"], path + o["path"]);
             }
         });
     }
@@ -166,6 +187,12 @@ export class AssetManager {
     public getSample(name : string) : AudioSample {
 
         return this.samples.getAsset(name);
+    }
+
+
+    public getTilemap(name : string) : Tilemap {
+
+        return this.tilemaps.getAsset(name);
     }
 
 

@@ -3,6 +3,7 @@ import { AudioPlayer } from "./audioplayer.js";
 import { Canvas } from "./canvas.js";
 import { InputManager } from "./input.js";
 import { AudioSample } from "./sample.js";
+import { Tilemap } from "./tilemap.js";
 import { TransitionEffectManager } from "./transition.js";
 import { State } from "./types.js";
 import { Vector2 } from "./vector.js";
@@ -59,6 +60,7 @@ export class FrameState {
 
     
     public getSample = (name : string) : AudioSample => this.assets.getSample(name);
+    public getTilemap = (name : string) : Tilemap => this.assets.getTilemap(name);
 }
 
 
@@ -124,29 +126,34 @@ export class Core {
 
         let barWidth = canvas.width / 4;
         let barHeight = barWidth / 8;
-/*
-        c.clear(0, 0, 0);
+
+        canvas.clear(0, 0, 0);
+        canvas.toggleTexturing(false);
+
+        canvas.transform.loadIdentity();
+        canvas.transform.setView(canvas.width, canvas.height);
+        canvas.transform.use();
     
         let t = this.assets.dataLoadedUnit();
-        let x = c.width/2 - barWidth/2;
-        let y = c.height/2 - barHeight/2;
+        let x = canvas.width/2 - barWidth/2;
+        let y = canvas.height/2 - barHeight/2;
 
         x |= 0;
         y |= 0;
     
         // Outlines
-        c.setFillColor(255);
-        c.fillRect(x-BAR_BORDER_WIDTH*2, y-BAR_BORDER_WIDTH*2, 
+        canvas.setDrawColor();
+        canvas.drawRectangle(x-BAR_BORDER_WIDTH*2, y-BAR_BORDER_WIDTH*2, 
             barWidth+BAR_BORDER_WIDTH*4, barHeight+BAR_BORDER_WIDTH*4);
-        c.setFillColor(0);
-        c.fillRect(x-BAR_BORDER_WIDTH, y-BAR_BORDER_WIDTH, 
+        canvas.setDrawColor(0, 0, 0);
+        canvas.drawRectangle(x-BAR_BORDER_WIDTH, y-BAR_BORDER_WIDTH, 
             barWidth+BAR_BORDER_WIDTH*2, barHeight+BAR_BORDER_WIDTH*2);
     
         // Bar
         let w = (barWidth*t) | 0;
-        c.setFillColor(255);
-        c.fillRect(x, y, w, barHeight);
-        */
+        canvas.setDrawColor(255);
+        canvas.drawRectangle(x, y, w, barHeight);
+        
     }
 
 

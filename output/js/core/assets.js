@@ -1,4 +1,5 @@
 import { AudioSample } from "./sample.js";
+import { Tilemap } from "./tilemap.js";
 import { KeyValuePair } from "./types.js";
 export class AssetContainer {
     constructor() {
@@ -19,6 +20,7 @@ export class AssetManager {
     constructor(audio) {
         this.bitmaps = new AssetContainer();
         this.samples = new AssetContainer();
+        this.tilemaps = new AssetContainer();
         this.total = 0;
         this.loaded = 0;
         this.audio = audio;
@@ -64,6 +66,13 @@ export class AssetManager {
         };
         xobj.send(null);
     }
+    loadTilemap(name, url) {
+        ++this.total;
+        this.loadTextfile(url, "xml", (str) => {
+            this.tilemaps.addAsset(name, new Tilemap(str));
+            ++this.loaded;
+        });
+    }
     parseAssetIndexFile(url) {
         this.loadTextfile(url, "json", (s) => {
             let data = JSON.parse(s);
@@ -75,6 +84,10 @@ export class AssetManager {
             for (let o of data["samples"]) {
                 this.loadSample(o["name"], path + o["path"]);
             }
+            path = data["tilemapPath"];
+            for (let o of data["tilemaps"]) {
+                this.loadTilemap(o["name"], path + o["path"]);
+            }
         });
     }
     hasLoaded() {
@@ -85,6 +98,9 @@ export class AssetManager {
     }
     getSample(name) {
         return this.samples.getAsset(name);
+    }
+    getTilemap(name) {
+        return this.tilemaps.getAsset(name);
     }
     dataLoadedUnit() {
         return this.total == 0 ? 1.0 : this.loaded / this.total;

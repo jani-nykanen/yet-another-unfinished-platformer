@@ -119,6 +119,9 @@ export class Canvas {
         this.bindMesh(this.rectangle);
         this.activeMesh.draw(this.glCtx);
     }
+    drawBitmap(bmp, dx, dy, dw = bmp.width, dh = bmp.height) {
+        this.drawBitmapRegion(bmp, 0, 0, bmp.width, bmp.height, dx, dy, dw, dh);
+    }
     drawBitmapRegion(bmp, sx, sy, sw, sh, dx, dy, dw = bmp.width, dh = bmp.height) {
         this.activeShader.setVertexTransform(dx, dy, dw, dh);
         this.activeShader.setFragTransform(sx / bmp.width, sy / bmp.height, sw / bmp.width, sh / bmp.height);

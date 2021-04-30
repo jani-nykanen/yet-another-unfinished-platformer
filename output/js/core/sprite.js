@@ -52,26 +52,10 @@ export class Sprite {
         if (!preserveTimer)
             this.timer = 0;
     }
-    drawScaledFrame(c, bmp, column, row, dx, dy, dw, dh, flip = Flip.None) {
-        /*
-            c.drawScaledBitmapRegion(bmp,
-                this.width * column, this.height * row,
-                this.width, this.height,
-                dx, dy, dw, dh, flip);
-            */
+    drawFrame(canvas, bmp, column, row, dx, dy, dw = this.width, dh = this.height) {
+        canvas.drawBitmapRegion(bmp, this.width * column, this.height * row, this.width, this.height, dx, dy, dw, dh);
     }
-    drawFrame(c, bmp, column, row, dx, dy, flip = Flip.None) {
-        /*
-        c.drawBitmapRegion(bmp,
-            this.width * column, this.height * row,
-            this.width, this.height,
-            dx, dy, flip);
-        */
-    }
-    draw(c, bmp, dx, dy, flip = Flip.None) {
-        this.drawFrame(c, bmp, this.column, this.row, dx, dy, flip);
-    }
-    drawScaled(c, bmp, dx, dy, dw, dh, flip = Flip.None) {
-        this.drawScaledFrame(c, bmp, this.column, this.row, dx, dy, dw, dh, flip);
+    draw(canvas, bmp, dx, dy, flip = Flip.None) {
+        this.drawFrame(canvas, bmp, this.column, this.row, dx, dy, flip);
     }
 }
