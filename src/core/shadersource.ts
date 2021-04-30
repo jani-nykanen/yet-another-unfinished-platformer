@@ -4,7 +4,8 @@ export const VertexSource = {
 
 Default : 
     
-`attribute vec2 vertexPos;
+`
+attribute vec2 vertexPos;
 attribute vec2 vertexUV;
 
 uniform mat3 transform;
@@ -25,7 +26,8 @@ export const FragmentSource = {
 
 Default : 
 
-`precision mediump float;
+`
+precision mediump float;
      
 uniform sampler2D texSampler;
 

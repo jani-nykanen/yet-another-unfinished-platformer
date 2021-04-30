@@ -2,6 +2,7 @@ import { Bitmap } from "./bitmap.js";
 import { Mesh } from "./mesh.js";
 import { Shader } from "./shader.js";
 import { FragmentSource, VertexSource } from "./shadersource.js";
+import { Transformations } from "./transformations.js";
 export var Flip;
 (function (Flip) {
     Flip[Flip["None"] = 0] = "None";
@@ -24,6 +25,8 @@ export class Canvas {
         this.rectangle = this.createRectangleMesh();
         this.rectangle.bind(this.glCtx);
         this.activeMesh = this.rectangle;
+        this.transform = new Transformations(this.activeShader);
+        this.activeTexture = null;
     }
     createHtml5Canvas(width, height) {
         let cdiv = document.createElement("div");
@@ -70,7 +73,7 @@ export class Canvas {
     initOpenGL() {
         let gl = this.glCtx;
         gl.activeTexture(gl.TEXTURE0);
-        gl.enable(gl.DEPTH_TEST);
+        gl.disable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
         gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enableVertexAttribArray(0);
@@ -88,12 +91,51 @@ export class Canvas {
         mesh.bind(this.glCtx);
         this.activeMesh = mesh;
     }
+    bindTexture(bmp) {
+        if (this.activeTexture == bmp)
+            return;
+        bmp.bind(this.glCtx);
+        this.activeTexture = bmp;
+    }
     drawRectangle(x, y, w, h) {
         this.activeShader.setVertexTransform(x, y, w, h);
         this.bindMesh(this.rectangle);
         this.activeMesh.draw(this.glCtx);
     }
+    drawBitmapRegion(bmp, sx, sy, sw, sh, dx, dy, dw = bmp.width, dh = bmp.height) {
+        this.activeShader.setVertexTransform(dx, dy, dw, dh);
+        this.activeShader.setFragTransform(sx / bmp.width, sy / bmp.height, sw / bmp.width, sh / bmp.height);
+        this.bindMesh(this.rectangle);
+        this.bindTexture(bmp);
+        this.activeMesh.draw(this.glCtx);
+    }
+    drawText(font, str, dx, dy, xoff = 0.0, yoff = 0.0, center = false, scalex = 1, scaley = 1, wave = 0.0, amplitude = 0.0, period = 0.0) {
+        let cw = (font.width / 16) | 0;
+        let ch = cw;
+        let x = dx;
+        let y = dy;
+        let chr;
+        let yoffset;
+        if (center) {
+            dx -= ((str.length + 1) * (cw + xoff) * scalex) / 2.0;
+            x = dx;
+        }
+        for (let i = 0; i < str.length; ++i) {
+            chr = str.charCodeAt(i);
+            if (chr == '\n'.charCodeAt(0)) {
+                x = dx;
+                y += (ch + yoff) * scaley;
+                continue;
+            }
+            yoffset = Math.sin(wave + i * period) * amplitude;
+            this.drawBitmapRegion(font, (chr % 16) * cw, ((chr / 16) | 0) * ch, cw, ch, x, y + yoffset, cw * scalex, ch * scaley);
+            x += (cw + xoff) * scalex;
+        }
+    }
     createBitmap(image) {
         return new Bitmap(this.glCtx, image);
+    }
+    getBitmap(name) {
+        return this.assets.getBitmap(name);
     }
 }

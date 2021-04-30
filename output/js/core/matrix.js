@@ -1,5 +1,6 @@
 export class Matrix3 {
     constructor(data = null) {
+        this.clone = () => new Matrix3(this.m);
         this.m = data != null ? Float32Array.from(data) : (new Float32Array(9)).fill(0);
     }
     static rotate(angle) {

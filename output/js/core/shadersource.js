@@ -1,5 +1,6 @@
 export const VertexSource = {
-    Default: `attribute vec2 vertexPos;
+    Default: `
+attribute vec2 vertexPos;
 attribute vec2 vertexUV;
 
 uniform mat3 transform;
@@ -15,7 +16,8 @@ void main() {
 }`,
 };
 export const FragmentSource = {
-    Default: `precision mediump float;
+    Default: `
+precision mediump float;
      
 uniform sampler2D texSampler;
 
@@ -30,6 +32,11 @@ void main() {
 
     vec2 tex = uv * texSize + texPos;    
     vec4 res = texture2D(texSampler, tex) * color;
+
+    // if(res.a <= DELTA) {
+    //     discard;
+    // }
+
     gl_FragColor = res;
 }`,
 };

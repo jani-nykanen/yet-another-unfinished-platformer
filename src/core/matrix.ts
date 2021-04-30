@@ -96,5 +96,8 @@ export class Matrix3 {
  
         gl.uniformMatrix3fv(uniform, false, Matrix3.transpose(this).m);        
     }
+
+
+    public clone = () : Matrix3 => new Matrix3(this.m);
 }
 
