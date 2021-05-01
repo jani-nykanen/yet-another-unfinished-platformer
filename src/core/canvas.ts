@@ -35,6 +35,8 @@ export class Canvas {
     private activeMesh : Mesh;
     private activeTexture : Bitmap;
 
+    private contrast : number;
+
     public readonly transform : Transformations;
 
 
@@ -70,6 +72,8 @@ export class Canvas {
         this.whiteFilter = new Bitmap(this.glCtx, null, 
             new Uint8Array([255, 255, 255, 255]), 1, 1);
         this.setFilterTexture(this.whiteFilter);
+
+        this.contrast = 0.0;
     }
 
 
@@ -209,6 +213,7 @@ export class Canvas {
         this.transform.use();
 
         this.activeShader.setFrameSize(this.width, this.height);
+        this.activeShader.setContrast(this.contrast);
     }
 
 
@@ -318,5 +323,12 @@ export class Canvas {
         gl.activeTexture(gl.TEXTURE1);
         bmp.bind(gl);
         gl.activeTexture(gl.TEXTURE0);
+    }
+
+
+    public setContrast(constrast : number) {
+
+        this.activeShader.setContrast(constrast);
+        this.contrast = constrast;
     }
 }

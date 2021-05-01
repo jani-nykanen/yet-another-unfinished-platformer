@@ -7,5 +7,5 @@ window.onload = () => (new Core(1024, 768))
     .addInputAction("select", "ShiftLeft", 4, 5)
     .loadAssets("assets/index.json")
     .run(GameScene, state => {
-    state.setFilterTexture("paperFilter");
+    state.setFilter("paperFilter", 0.1);
 });

@@ -62,9 +62,10 @@ export class FrameState {
     }
 
 
-    public setFilterTexture(name : string) {
+    public setFilter(name : string, contrast = 0) {
 
         this.canvas.setFilterTexture(this.assets.getBitmap(name));
+        this.canvas.setContrast(contrast);
     }
 
 

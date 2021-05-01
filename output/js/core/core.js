@@ -28,8 +28,9 @@ export class FrameState {
     changeScene(newScene) {
         this.core.changeScene(newScene);
     }
-    setFilterTexture(name) {
+    setFilter(name, contrast = 0) {
         this.canvas.setFilterTexture(this.assets.getBitmap(name));
+        this.canvas.setContrast(contrast);
     }
 }
 export class Core {

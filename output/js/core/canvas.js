@@ -31,6 +31,7 @@ export class Canvas {
         this.activeTexture = null;
         this.whiteFilter = new Bitmap(this.glCtx, null, new Uint8Array([255, 255, 255, 255]), 1, 1);
         this.setFilterTexture(this.whiteFilter);
+        this.contrast = 0.0;
     }
     createHtml5Canvas(width, height) {
         let cdiv = document.createElement("div");
@@ -114,6 +115,7 @@ export class Canvas {
         this.transform.setActiveShader(this.activeShader);
         this.transform.use();
         this.activeShader.setFrameSize(this.width, this.height);
+        this.activeShader.setContrast(this.contrast);
     }
     setDrawColor(r = 1, g = 1, b = 1, a = 1) {
         this.activeShader.setColor(r, g, b, a);
@@ -169,5 +171,9 @@ export class Canvas {
         gl.activeTexture(gl.TEXTURE1);
         bmp.bind(gl);
         gl.activeTexture(gl.TEXTURE0);
+    }
+    setContrast(constrast) {
+        this.activeShader.setContrast(constrast);
+        this.contrast = constrast;
     }
 }

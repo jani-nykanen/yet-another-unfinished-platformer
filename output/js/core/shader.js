@@ -46,6 +46,7 @@ export class Shader {
         this.uniformTextureSampler = gl.getUniformLocation(this.shaderProgram, "texSampler");
         this.uniformFilterSampler = gl.getUniformLocation(this.shaderProgram, "filterSampler");
         this.uniformFrameSize = gl.getUniformLocation(this.shaderProgram, "frameSize");
+        this.uniformContrast = gl.getUniformLocation(this.shaderProgram, "contrast");
     }
     use() {
         let gl = this.gl;
@@ -58,6 +59,7 @@ export class Shader {
         this.setTransformMatrix(Matrix3.identity());
         this.setColor(1, 1, 1, 1);
         this.setFrameSize(1, 1);
+        this.setContrast(0.0);
     }
     setVertexTransform(x, y, w, h) {
         let gl = this.gl;
@@ -78,5 +80,8 @@ export class Shader {
     }
     setFrameSize(width, height) {
         this.gl.uniform2f(this.uniformFrameSize, width, height);
+    }
+    setContrast(contrast) {
+        this.gl.uniform1f(this.uniformContrast, contrast);
     }
 }

@@ -10,6 +10,6 @@ window.onload = () : void => (new Core(1024, 768))
     .loadAssets("assets/index.json")
     .run(GameScene,
         state => {
-            state.setFilterTexture("paperFilter")
+            state.setFilter("paperFilter", 0.1)
         });
 
