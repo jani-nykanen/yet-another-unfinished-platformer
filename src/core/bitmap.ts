@@ -8,7 +8,8 @@ export class Bitmap {
     public readonly height : number;
 
 
-    constructor(gl : WebGLRenderingContext, image : HTMLImageElement) {
+    constructor(gl : WebGLRenderingContext, image : HTMLImageElement, 
+        data = <Uint8Array>null, width = 0, height = 0) {
 
         this.texture = gl.createTexture();
 
@@ -19,12 +20,24 @@ export class Bitmap {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
     
-        gl.texImage2D(gl.TEXTURE_2D, 
-            0, gl.RGBA, gl.RGBA, 
-            gl.UNSIGNED_BYTE, image);
+        if (image != null) {
 
-        this.width = image.width;
-        this.height = image.height;
+            gl.texImage2D(gl.TEXTURE_2D, 
+                0, gl.RGBA, gl.RGBA, 
+                gl.UNSIGNED_BYTE, image);
+
+            this.width = image.width;
+            this.height = image.height;
+        }
+        else {
+
+            gl.texImage2D(gl.TEXTURE_2D, 
+                0, gl.RGBA, width, height, 0, 
+                gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+            this.width = width;
+            this.height = height;
+        }
     }
 
 

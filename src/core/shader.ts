@@ -15,6 +15,8 @@ export class Shader {
     private uniformFragmentScale : WebGLUniformLocation;
     private uniformFragmentColor : WebGLUniformLocation;
     private uniformTextureSampler : WebGLUniformLocation;
+    private uniformFilterSampler : WebGLUniformLocation;
+    private uniformFrameSize : WebGLUniformLocation;
 
 
     constructor(gl : WebGLRenderingContext, vertexSource : string, fragmentSource : string) {
@@ -91,6 +93,8 @@ export class Shader {
         this.uniformFragmentScale = gl.getUniformLocation(this.shaderProgram, "texSize");
         this.uniformFragmentColor = gl.getUniformLocation(this.shaderProgram, "color");
         this.uniformTextureSampler = gl.getUniformLocation(this.shaderProgram, "texSampler");
+        this.uniformFilterSampler = gl.getUniformLocation(this.shaderProgram, "filterSampler");
+        this.uniformFrameSize = gl.getUniformLocation(this.shaderProgram, "frameSize");
     }
 
 
@@ -102,10 +106,13 @@ export class Shader {
         this.getUniformLocations();
 
         gl.uniform1i(this.uniformTextureSampler, 0);
+        gl.uniform1i(this.uniformFilterSampler, 1);
+
         this.setVertexTransform(0, 0, 1, 1);
         this.setFragTransform(0, 0, 1, 1);
         this.setTransformMatrix(Matrix3.identity());
         this.setColor(1, 1, 1, 1);
+        this.setFrameSize(1, 1);
     }
 
 
@@ -137,5 +144,11 @@ export class Shader {
     public setTransformMatrix(matrix : Matrix3) {
 
         matrix.passToShader(this.gl, this.uniformTransform);
+    }
+
+
+    public setFrameSize(width : number, height : number) {
+
+        this.gl.uniform2f(this.uniformFrameSize, width, height);
     }
 }

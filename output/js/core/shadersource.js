@@ -32,11 +32,14 @@ export const FragmentSource = {
 precision mediump float;
      
 uniform sampler2D texSampler;
+uniform sampler2D filterSampler;
 
 uniform vec4 color;
 
 uniform vec2 texPos;
 uniform vec2 texSize;
+
+uniform vec2 frameSize;
 
 varying vec2 uv;
 
@@ -55,6 +58,9 @@ void main() {
 precision mediump float;
 
 uniform vec4 color;
+uniform sampler2D filterSampler;
+
+uniform vec2 frameSize;
 
 void main() {
 

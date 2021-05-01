@@ -4,7 +4,7 @@ import { Canvas } from "./canvas.js";
 import { InputManager } from "./input.js";
 import { TransitionEffectManager } from "./transition.js";
 export class FrameState {
-    constructor(step, core, input, assets, transition, audio) {
+    constructor(step, core, input, assets, canvas, transition, audio) {
         this.leftPress = () => this.input.leftPress();
         this.rightPress = () => this.input.rightPress();
         this.upPress = () => this.input.upPress();
@@ -17,6 +17,7 @@ export class FrameState {
         this.assets = assets;
         this.transition = transition;
         this.audio = audio;
+        this.canvas = canvas;
     }
     getStick() {
         return this.input.getStick();
@@ -26,6 +27,9 @@ export class FrameState {
     }
     changeScene(newScene) {
         this.core.changeScene(newScene);
+    }
+    setFilterTexture(name) {
+        this.canvas.setFilterTexture(this.assets.getBitmap(name));
     }
 }
 export class Core {
@@ -40,7 +44,7 @@ export class Core {
             .addAction("right", "ArrowRight", 15)
             .addAction("down", "ArrowDown", 13),
             this.transition = new TransitionEffectManager();
-        this.state = new FrameState(frameSkip + 1, this, this.input, this.assets, this.transition, this.audio);
+        this.state = new FrameState(frameSkip + 1, this, this.input, this.assets, this.canvas, this.transition, this.audio);
         this.timeSum = 0.0;
         this.oldTime = 0.0;
         this.initialized = false;
@@ -71,7 +75,7 @@ export class Core {
         canvas.setDrawColor(255);
         canvas.drawRectangle(x, y, w, barHeight);
     }
-    loop(ts) {
+    loop(ts, onLoad) {
         const MAX_REFRESH_COUNT = 5;
         const FRAME_WAIT = 16.66667 * this.state.step;
         this.timeSum += ts - this.oldTime;
@@ -80,6 +84,7 @@ export class Core {
         let refreshCount = (this.timeSum / FRAME_WAIT) | 0;
         while ((refreshCount--) > 0) {
             if (!this.initialized && this.assets.hasLoaded()) {
+                onLoad(this.state);
                 if (this.activeSceneType != null)
                     this.activeScene = new this.activeSceneType.prototype.constructor(null, this.state);
                 this.initialized = true;
@@ -100,7 +105,7 @@ export class Core {
         else {
             this.drawLoadingScreen(this.canvas);
         }
-        window.requestAnimationFrame(ts => this.loop(ts));
+        window.requestAnimationFrame(ts => this.loop(ts, onLoad));
     }
     addInputAction(name, key, button1, button2 = -1) {
         this.input.addAction(name, key, button1, button2);
@@ -110,9 +115,9 @@ export class Core {
         this.assets.parseAssetIndexFile(indexFilePath);
         return this;
     }
-    run(initialScene) {
+    run(initialScene, onLoad) {
         this.activeSceneType = initialScene;
-        this.loop(0);
+        this.loop(0, onLoad);
     }
     changeScene(newScene) {
         let param = this.activeScene.dispose();

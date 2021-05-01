@@ -30,6 +30,8 @@ export class Canvas {
     private activeShader : Shader;
 
     private rectangle : Mesh;
+    private whiteFilter : Bitmap;
+
     private activeMesh : Mesh;
     private activeTexture : Bitmap;
 
@@ -55,6 +57,7 @@ export class Canvas {
             this.glCtx, VertexSource.Default, FragmentSource.Default);
         this.defaultShader.use();
         this.activeShader = this.defaultShader;
+        this.activeShader.setFrameSize(this.width, this.height);
 
         this.rectangle = this.createRectangleMesh();
         this.rectangle.bind(this.glCtx);
@@ -63,6 +66,10 @@ export class Canvas {
         this.transform = new Transformations(this.activeShader);
 
         this.activeTexture = null;
+
+        this.whiteFilter = new Bitmap(this.glCtx, null, 
+            new Uint8Array([255, 255, 255, 255]), 1, 1);
+        this.setFilterTexture(this.whiteFilter);
     }
 
 
@@ -200,6 +207,8 @@ export class Canvas {
 
         this.transform.setActiveShader(this.activeShader);
         this.transform.use();
+
+        this.activeShader.setFrameSize(this.width, this.height);
     }
 
 
@@ -296,5 +305,18 @@ export class Canvas {
     public getBitmap(name : string) :Bitmap {
 
         return this.assets.getBitmap(name);
+    }
+
+
+    public setFilterTexture(bmp : Bitmap) {
+
+        let gl = this.glCtx;
+
+        if (bmp == null)
+            bmp = this.whiteFilter;
+
+        gl.activeTexture(gl.TEXTURE1);
+        bmp.bind(gl);
+        gl.activeTexture(gl.TEXTURE0);
     }
 }

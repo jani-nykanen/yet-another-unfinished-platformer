@@ -18,11 +18,13 @@ export class FrameState {
 
     private readonly input : InputManager;
     private readonly assets : AssetManager;
+    private readonly canvas : Canvas;
     private readonly core : Core;
 
 
     constructor(step : number, core : Core,
         input : InputManager, assets : AssetManager,
+        canvas : Canvas,
         transition : TransitionEffectManager,
         audio : AudioPlayer) {
 
@@ -32,6 +34,7 @@ export class FrameState {
         this.assets = assets;
         this.transition = transition;
         this.audio = audio;
+        this.canvas = canvas;
     }
 
 
@@ -58,7 +61,13 @@ export class FrameState {
         this.core.changeScene(newScene);
     }
 
-    
+
+    public setFilterTexture(name : string) {
+
+        this.canvas.setFilterTexture(this.assets.getBitmap(name));
+    }
+
+
     public getSample = (name : string) : AudioSample => this.assets.getSample(name);
     public getTilemap = (name : string) : Tilemap => this.assets.getTilemap(name);
 }
@@ -108,7 +117,8 @@ export class Core {
         this.transition = new TransitionEffectManager();
         
         this.state = new FrameState(frameSkip+1, this,
-            this.input, this.assets, this.transition, this.audio);
+            this.input, this.assets, this.canvas,
+            this.transition, this.audio);
 
         this.timeSum = 0.0;
         this.oldTime = 0.0;
@@ -157,7 +167,7 @@ export class Core {
     }
 
 
-    private loop(ts : number) {
+    private loop(ts : number, onLoad : ((state : FrameState) => void)) {
 
         const MAX_REFRESH_COUNT = 5;
         const FRAME_WAIT = 16.66667 * this.state.step;
@@ -171,6 +181,8 @@ export class Core {
 
             if (!this.initialized && this.assets.hasLoaded()) {
                 
+                onLoad(this.state);
+
                 if (this.activeSceneType != null)
                     this.activeScene = new this.activeSceneType.prototype.constructor(null, this.state);
                     
@@ -202,7 +214,7 @@ export class Core {
             this.drawLoadingScreen(this.canvas);
         }
 
-        window.requestAnimationFrame(ts => this.loop(ts));
+        window.requestAnimationFrame(ts => this.loop(ts, onLoad));
     }
 
 
@@ -223,11 +235,11 @@ export class Core {
     }
 
 
-    public run(initialScene : Function) {
+    public run(initialScene : Function, onLoad : ((state : FrameState) => void)) {
 
         this.activeSceneType = initialScene;
 
-        this.loop(0);
+        this.loop(0, onLoad);
     }
 
 

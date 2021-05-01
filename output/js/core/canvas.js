@@ -23,11 +23,14 @@ export class Canvas {
         this.defaultShader = new Shader(this.glCtx, VertexSource.Default, FragmentSource.Default);
         this.defaultShader.use();
         this.activeShader = this.defaultShader;
+        this.activeShader.setFrameSize(this.width, this.height);
         this.rectangle = this.createRectangleMesh();
         this.rectangle.bind(this.glCtx);
         this.activeMesh = this.rectangle;
         this.transform = new Transformations(this.activeShader);
         this.activeTexture = null;
+        this.whiteFilter = new Bitmap(this.glCtx, null, new Uint8Array([255, 255, 255, 255]), 1, 1);
+        this.setFilterTexture(this.whiteFilter);
     }
     createHtml5Canvas(width, height) {
         let cdiv = document.createElement("div");
@@ -110,6 +113,7 @@ export class Canvas {
         this.activeShader.use();
         this.transform.setActiveShader(this.activeShader);
         this.transform.use();
+        this.activeShader.setFrameSize(this.width, this.height);
     }
     setDrawColor(r = 1, g = 1, b = 1, a = 1) {
         this.activeShader.setColor(r, g, b, a);
@@ -157,5 +161,13 @@ export class Canvas {
     }
     getBitmap(name) {
         return this.assets.getBitmap(name);
+    }
+    setFilterTexture(bmp) {
+        let gl = this.glCtx;
+        if (bmp == null)
+            bmp = this.whiteFilter;
+        gl.activeTexture(gl.TEXTURE1);
+        bmp.bind(gl);
+        gl.activeTexture(gl.TEXTURE0);
     }
 }

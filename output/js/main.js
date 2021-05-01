@@ -6,4 +6,6 @@ window.onload = () => (new Core(1024, 768))
     .addInputAction("back", "Escape", 8, 6)
     .addInputAction("select", "ShiftLeft", 4, 5)
     .loadAssets("assets/index.json")
-    .run(GameScene);
+    .run(GameScene, state => {
+    state.setFilterTexture("paperFilter");
+});
