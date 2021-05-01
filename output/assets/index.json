@@ -3,6 +3,8 @@
     "bitmaps" : [
 
         {"name": "paperFilter",  "path": "paperfilter.jpg"},
+        {"name": "test",  "path": "test.png"},
+        {"name": "tileset",  "path": "tileset.png"},
         {"name": "font",  "path": "font.png"}
     ],
 

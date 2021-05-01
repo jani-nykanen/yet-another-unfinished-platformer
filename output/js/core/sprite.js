@@ -1,4 +1,3 @@
-import { Flip } from "./canvas.js";
 export class Sprite {
     constructor(w, h) {
         this.getRow = () => this.row;
@@ -55,7 +54,7 @@ export class Sprite {
     drawFrame(canvas, bmp, column, row, dx, dy, dw = this.width, dh = this.height) {
         canvas.drawBitmapRegion(bmp, this.width * column, this.height * row, this.width, this.height, dx, dy, dw, dh);
     }
-    draw(canvas, bmp, dx, dy, flip = Flip.None) {
-        this.drawFrame(canvas, bmp, this.column, this.row, dx, dy, flip);
+    draw(canvas, bmp, dx, dy) {
+        this.drawFrame(canvas, bmp, this.column, this.row, dx, dy);
     }
 }

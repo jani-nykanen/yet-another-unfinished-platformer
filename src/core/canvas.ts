@@ -243,7 +243,7 @@ export class Canvas {
 
     public drawBitmapRegion(bmp : Bitmap, 
         sx : number, sy : number, sw : number, sh : number,
-        dx : number, dy : number, dw = bmp.width, dh = bmp.height) {
+        dx : number, dy : number, dw = sw, dh = sh) {
 
         this.activeShader.setVertexTransform(dx, dy, dw, dh);
         this.activeShader.setFragTransform(
