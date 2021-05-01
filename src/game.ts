@@ -26,6 +26,9 @@ export class GameScene implements Scene {
         canvas.transform.use();
 
         canvas.toggleTexturing(false);
+        canvas.setDrawColor(0.67, 0.67, 0.67);
+        canvas.drawRectangle(0, 0, canvas.width, canvas.height);
+        
         canvas.setDrawColor(1, 0, 0, 1);
         canvas.drawRectangle(128, 128, 256, 256);
 

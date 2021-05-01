@@ -1,5 +1,19 @@
 
 
+
+const BLEND_FILTER = 
+`
+vec4 apply_filter(vec4 baseColor) {
+
+	vec4 filter = texture2D(filterSampler, 
+        vec2(gl_FragCoord.x / frameSize.x,
+            gl_FragCoord.y / frameSize.y));
+	
+	return baseColor * filter;
+}`;
+
+
+
 export const VertexSource = {
 
 Default : 
@@ -55,7 +69,9 @@ uniform vec2 texSize;
 uniform vec2 frameSize;
 
 varying vec2 uv;
-
+`
++ BLEND_FILTER +
+`
 void main() {
 
     vec2 tex = uv * texSize + texPos;    
@@ -65,7 +81,7 @@ void main() {
     //     discard;
     // }
 
-    gl_FragColor = res;
+    gl_FragColor = apply_filter(res);
 }`,
 
 
@@ -76,12 +92,16 @@ NoTexture :
 precision mediump float;
 
 uniform vec4 color;
+
+uniform sampler2D texSampler;
 uniform sampler2D filterSampler;
 
 uniform vec2 frameSize;
-
+`
++ BLEND_FILTER +
+`
 void main() {
 
-    gl_FragColor = color;
+    gl_FragColor = apply_filter(color);
 }`,
 }

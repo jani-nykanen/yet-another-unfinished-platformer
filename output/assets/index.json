@@ -2,7 +2,7 @@
     "bitmapPath" : "assets/bitmaps/",
     "bitmaps" : [
 
-        {"name": "paperFilter",  "path": "paperfilter.png"},
+        {"name": "paperFilter",  "path": "paperfilter.jpg"},
         {"name": "font",  "path": "font.png"}
     ],
 
