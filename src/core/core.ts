@@ -71,6 +71,7 @@ export class FrameState {
 
     public getSample = (name : string) : AudioSample => this.assets.getSample(name);
     public getTilemap = (name : string) : Tilemap => this.assets.getTilemap(name);
+    public getDocument = (name : string) : string => this.assets.getDocument(name);
 }
 
 

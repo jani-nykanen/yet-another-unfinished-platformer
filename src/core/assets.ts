@@ -44,6 +44,7 @@ export class AssetManager {
     private bitmaps : AssetContainer<Bitmap>;
     private samples : AssetContainer<AudioSample>;
     private tilemaps : AssetContainer<Tilemap>;
+    private documents : AssetContainer<string>;
     private loaded : number;
     private total : number;
     
@@ -60,6 +61,7 @@ export class AssetManager {
         this.bitmaps = new AssetContainer<Bitmap> ();
         this.samples = new AssetContainer<AudioSample> ();
         this.tilemaps = new AssetContainer<Tilemap> ();
+        this.documents = new AssetContainer<string> ();
 
         this.total = 0;
         this.loaded = 0;
@@ -146,6 +148,18 @@ export class AssetManager {
     }
 
 
+    public loadDocument(name : string, url : string) {
+
+        ++ this.total;
+        
+        this.loadTextfile(url, "xml", (str : string) => {
+
+            this.documents.addAsset(name, str);
+            ++ this.loaded;
+        });
+    }
+
+
     public parseAssetIndexFile(url : string) {
 
         this.loadTextfile(url, "json", (s : string) => {
@@ -167,6 +181,12 @@ export class AssetManager {
             for (let o of data["tilemaps"]) {
 
                 this.loadTilemap(o["name"], path + o["path"]);
+            }
+
+            path = data["documentPath"];
+            for (let o of data["documents"]) {
+
+                this.loadDocument(o["name"], path + o["path"]);
             }
         });
     }
@@ -193,6 +213,12 @@ export class AssetManager {
     public getTilemap(name : string) : Tilemap {
 
         return this.tilemaps.getAsset(name);
+    }
+
+
+    public getDocument(name : string) : string {
+
+        return this.documents.getAsset(name);
     }
 
 

@@ -28,7 +28,7 @@ export class Player extends CollisionObject {
         this.friction = new Vector2(0.5, 0.5);
         this.hitbox = new Vector2(80, 160);
         this.collisionBox = new Vector2(80, 160);
-        this.center = new Vector2();
+        this.center = new Vector2(0, 32);
 
         this.canJump = false;
         this.jumpTimer = 0;
@@ -47,7 +47,6 @@ export class Player extends CollisionObject {
     }
 
 
-    
     private control(state : FrameState) {
 
         const BASE_GRAVITY = 16.0;

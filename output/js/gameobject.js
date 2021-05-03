@@ -168,8 +168,8 @@ export class CollisionObject extends GameObject {
     }
     slopeCollision(x1, y1, x2, y2, dir, state, force = false) {
         const EPS = 0.001;
-        const NEAR_MARGIN = 2;
-        const FAR_MARGIN = 8;
+        const NEAR_MARGIN = 8;
+        const FAR_MARGIN = 32;
         if ((!force && this.disableCollisions) ||
             !this.exist || this.dying ||
             this.speed.y * dir < EPS ||

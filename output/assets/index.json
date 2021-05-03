@@ -4,7 +4,7 @@
 
         {"name": "paperFilter",  "path": "paperfilter.jpg"},
         {"name": "player",  "path": "player.png"},
-        {"name": "tileset",  "path": "tileset.png"},
+        {"name": "testScene",  "path": "test_scene.jpg"},
         {"name": "font",  "path": "font.png"}
     ],
 
@@ -16,6 +16,10 @@
     "tilemapPath" : "assets/tilemaps/",
     "tilemaps" : [
 
-        {"name": "map1",  "path": "1.tmx"}
+    ],
+
+    "documentPath" : "assets/levels/",
+    "documents" : [
+        {"name": "test", "path": "test.json"}
     ]
 }

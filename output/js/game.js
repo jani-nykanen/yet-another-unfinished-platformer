@@ -6,7 +6,7 @@ export class GameScene {
         this.stage = new Stage(state, 1);
     }
     update(state) {
-        this.objects.update(state);
+        this.objects.update(this.stage, state);
         this.stage.update(state);
     }
     redraw(canvas) {
@@ -14,9 +14,6 @@ export class GameScene {
         canvas.transform.loadIdentity();
         canvas.transform.setView(canvas.width, canvas.height);
         canvas.transform.use();
-        canvas.toggleTexturing(false);
-        canvas.setDrawColor(0.33, 0.67, 1.0);
-        canvas.drawRectangle(0, 0, canvas.width, canvas.height);
         canvas.toggleTexturing();
         canvas.setDrawColor();
         this.stage.draw(canvas);

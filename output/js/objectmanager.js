@@ -3,10 +3,9 @@ export class ObjectManager {
     constructor() {
         this.player = new Player(512, 384);
     }
-    update(state) {
+    update(stage, state) {
         this.player.update(state);
-        // Test collision
-        this.player.slopeCollision(0, 768, 1024, 512, 1, state);
+        stage.objectCollision(this.player, state);
     }
     draw(canvas) {
         this.player.draw(canvas);

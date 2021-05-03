@@ -11,6 +11,7 @@ export class FrameState {
         this.downPress = () => this.input.downPress();
         this.getSample = (name) => this.assets.getSample(name);
         this.getTilemap = (name) => this.assets.getTilemap(name);
+        this.getDocument = (name) => this.assets.getDocument(name);
         this.core = core;
         this.step = step;
         this.input = input;

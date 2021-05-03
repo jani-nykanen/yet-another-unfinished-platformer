@@ -21,6 +21,7 @@ export class AssetManager {
         this.bitmaps = new AssetContainer();
         this.samples = new AssetContainer();
         this.tilemaps = new AssetContainer();
+        this.documents = new AssetContainer();
         this.total = 0;
         this.loaded = 0;
         this.audio = audio;
@@ -73,6 +74,13 @@ export class AssetManager {
             ++this.loaded;
         });
     }
+    loadDocument(name, url) {
+        ++this.total;
+        this.loadTextfile(url, "xml", (str) => {
+            this.documents.addAsset(name, str);
+            ++this.loaded;
+        });
+    }
     parseAssetIndexFile(url) {
         this.loadTextfile(url, "json", (s) => {
             let data = JSON.parse(s);
@@ -88,6 +96,10 @@ export class AssetManager {
             for (let o of data["tilemaps"]) {
                 this.loadTilemap(o["name"], path + o["path"]);
             }
+            path = data["documentPath"];
+            for (let o of data["documents"]) {
+                this.loadDocument(o["name"], path + o["path"]);
+            }
         });
     }
     hasLoaded() {
@@ -101,6 +113,9 @@ export class AssetManager {
     }
     getTilemap(name) {
         return this.tilemaps.getAsset(name);
+    }
+    getDocument(name) {
+        return this.documents.getAsset(name);
     }
     dataLoadedUnit() {
         return this.total == 0 ? 1.0 : this.loaded / this.total;

@@ -1,6 +1,7 @@
 import { Canvas } from "./core/canvas.js";
 import { FrameState } from "./core/core.js";
 import { Player } from "./player.js";
+import { Stage } from "./stage.js";
 
 
 export class ObjectManager {
@@ -15,12 +16,10 @@ export class ObjectManager {
     }
 
 
-    public update(state : FrameState) {
+    public update(stage : Stage, state : FrameState) {
 
         this.player.update(state);
-
-        // Test collision
-        this.player.slopeCollision(0, 768, 1024, 512, 1, state);
+        stage.objectCollision(this.player, state);
     }
 
 

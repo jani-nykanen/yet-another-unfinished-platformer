@@ -21,7 +21,7 @@ export class GameScene implements Scene {
 
     public update(state : FrameState) {
 
-        this.objects.update(state);
+        this.objects.update(this.stage, state);
         this.stage.update(state);
     }
 
@@ -33,10 +33,6 @@ export class GameScene implements Scene {
         canvas.transform.loadIdentity();
         canvas.transform.setView(canvas.width, canvas.height);
         canvas.transform.use();
-
-        canvas.toggleTexturing(false);
-        canvas.setDrawColor(0.33, 0.67, 1.0);
-        canvas.drawRectangle(0, 0, canvas.width, canvas.height);
 
         canvas.toggleTexturing();
         canvas.setDrawColor();
