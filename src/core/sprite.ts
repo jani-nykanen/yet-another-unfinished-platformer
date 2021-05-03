@@ -100,11 +100,11 @@ export class Sprite {
 
 
     public draw(canvas : Canvas, bmp : Bitmap, 
-        dx : number, dy : number) {
+        dx : number, dy : number, dw = this.width, dh = this.height) {
 
         this.drawFrame(canvas, bmp, 
             this.column, this.row,
-            dx, dy);
+            dx, dy, dw, dh);
     }
 
 

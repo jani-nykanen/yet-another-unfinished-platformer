@@ -1,12 +1,13 @@
-import { Sprite } from "./core/sprite.js";
+import { ObjectManager } from "./objectmanager.js";
 import { Stage } from "./stage.js";
 export class GameScene {
     constructor(param, state) {
-        this.testSprite = new Sprite(256, 256);
+        this.objects = new ObjectManager();
         this.stage = new Stage(state, 1);
     }
     update(state) {
-        this.testSprite.animate(0, 0, 3, 6, state.step);
+        this.objects.update(state);
+        this.stage.update(state);
     }
     redraw(canvas) {
         canvas.clear();
@@ -19,7 +20,7 @@ export class GameScene {
         canvas.toggleTexturing();
         canvas.setDrawColor();
         this.stage.draw(canvas);
-        this.testSprite.draw(canvas, canvas.getBitmap("test"), canvas.width / 2 - 128, canvas.height / 2 - 128);
+        this.objects.draw(canvas);
         canvas.drawText(canvas.getBitmap("font"), "HELLO WORLD!", 16, 16, -26, 0);
     }
     dispose() {

@@ -3,6 +3,7 @@ import { Bitmap } from "./bitmap.js";
 import { Mesh } from "./mesh.js";
 import { Shader } from "./shader.js";
 import { FragmentSource, VertexSource } from "./shadersource.js";
+import { Sprite } from "./sprite.js";
 import { Transformations } from "./transformations.js";
 
 
@@ -298,6 +299,44 @@ export class Canvas {
 
             x += (cw + xoff) * scalex;
         }
+    }
+
+
+    public drawSpriteFrame(spr : Sprite, bmp : Bitmap, 
+        column : number, row : number,
+        dx : number, dy : number, 
+        dw = spr.width, dh = spr.height, flip = Flip.None) {
+
+        if (flip == Flip.Horizontal) {
+
+            dx += dw;
+            dw *= -1;
+        }
+        if (flip == Flip.Vertical) {
+
+            dy += dh;
+            dh *= -1;
+        }
+
+        spr.drawFrame(this, bmp, column, row, dx, dy, dw, dh);
+    }
+
+
+    public drawSprite(spr : Sprite, bmp : Bitmap, dx : number, dy : number, 
+        dw = spr.width, dh = spr.height, flip = Flip.None) {
+
+        if (flip == Flip.Horizontal) {
+            
+            dx += dw;
+            dw *= -1;
+        }
+        if (flip == Flip.Vertical) {
+
+            dy += dh;
+            dh *= -1;
+        }
+
+        spr.draw(this, bmp, dx, dy, dw, dh);
     }
 
 

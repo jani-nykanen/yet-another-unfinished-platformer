@@ -158,6 +158,28 @@ export class Canvas {
             x += (cw + xoff) * scalex;
         }
     }
+    drawSpriteFrame(spr, bmp, column, row, dx, dy, dw = spr.width, dh = spr.height, flip = Flip.None) {
+        if (flip == Flip.Horizontal) {
+            dx += dw;
+            dw *= -1;
+        }
+        if (flip == Flip.Vertical) {
+            dy += dh;
+            dh *= -1;
+        }
+        spr.drawFrame(this, bmp, column, row, dx, dy, dw, dh);
+    }
+    drawSprite(spr, bmp, dx, dy, dw = spr.width, dh = spr.height, flip = Flip.None) {
+        if (flip == Flip.Horizontal) {
+            dx += dw;
+            dw *= -1;
+        }
+        if (flip == Flip.Vertical) {
+            dy += dh;
+            dh *= -1;
+        }
+        spr.draw(this, bmp, dx, dy, dw, dh);
+    }
     createBitmap(image) {
         return new Bitmap(this.glCtx, image);
     }

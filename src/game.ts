@@ -1,28 +1,28 @@
 import { Canvas } from "./core/canvas.js";
 import { FrameState, Scene } from "./core/core.js";
 import { Sprite } from "./core/sprite.js";
+import { ObjectManager } from "./objectmanager.js";
 import { Stage } from "./stage.js";
 
 
 export class GameScene implements Scene {
 
 
-    private testSprite : Sprite;
-
+    private objects : ObjectManager;
     private stage : Stage;
 
 
     constructor(param : any, state : FrameState) {
 
-        this.testSprite = new Sprite(256, 256);
-
+        this.objects = new ObjectManager();
         this.stage = new Stage(state, 1);
     }   
 
 
     public update(state : FrameState) {
 
-        this.testSprite.animate(0, 0, 3, 6, state.step);
+        this.objects.update(state);
+        this.stage.update(state);
     }
 
 
@@ -42,9 +42,7 @@ export class GameScene implements Scene {
         canvas.setDrawColor();
 
         this.stage.draw(canvas);
-
-        this.testSprite.draw(canvas, canvas.getBitmap("test"),
-            canvas.width/2 - 128, canvas.height/2 - 128);
+        this.objects.draw(canvas);
 
         canvas.drawText(canvas.getBitmap("font"),
             "HELLO WORLD!", 16, 16, -26, 0);
