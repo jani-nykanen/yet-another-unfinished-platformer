@@ -1,7 +1,7 @@
 import { Bitmap } from "./core/bitmap.js";
 import { Canvas } from "./core/canvas.js";
 import { FrameState } from "./core/core.js";
-import { Vector2 } from "./core/vector.js";
+import { Rect, Vector2 } from "./core/vector.js";
 import { CollisionObject } from "./gameobject.js";
 
 
@@ -25,6 +25,7 @@ export class Stage {
 
 
     private slopes : Array<Line>;
+    private ladders : Array<Rect>;
 
     private backgroundLoaded : boolean;
     private background : Bitmap;
@@ -34,6 +35,7 @@ export class Stage {
     constructor(state : FrameState, levelIndex : number) {
 
         this.slopes = new Array<Line> ();
+        this.ladders = new Array<Rect> ();
 
         this.backgroundLoaded = false;
         this.scale = 1;
@@ -60,6 +62,13 @@ export class Stage {
                 Number(s["x1"]), Number(s["y1"]), Number(s["x2"]), Number(s["y2"])
             ));
         }
+
+        for (let s of data["ladders"]) {
+
+            this.ladders.push(new Rect(
+                Number(s["x"]), Number(s["y"]), Number(s["w"]), Number(s["h"])
+            ));
+        }
     }
 
 
@@ -72,10 +81,17 @@ export class Stage {
     public objectCollision(o : CollisionObject, state : FrameState) {
 
         const LEFT_COLLISION_MARGIN = 1024;
+        const LADDER_TOP_MARGIN = 16;
 
         for (let s of this.slopes) {
 
             o.slopeCollision(s.A.x, s.A.y, s.B.x, s.B.y, 1, state);
+        }
+
+        for (let l of this.ladders) {
+
+            o.ladderCollision(l.x, l.y, l.w, l.h, false, state);
+            o.ladderCollision(l.x, l.y, l.w, LADDER_TOP_MARGIN, true, state);
         }
 
         o.wallCollision(0, -LEFT_COLLISION_MARGIN, 768 + LEFT_COLLISION_MARGIN*2, 

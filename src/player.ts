@@ -1,12 +1,9 @@
 import { Canvas, Flip } from "./core/canvas.js";
 import { FrameState } from "./core/core.js";
-import { CollisionObject, computeFriction } from "./gameobject.js";
+import { boxOverlay, CollisionObject, computeFriction } from "./gameobject.js";
 import { Sprite } from "./core/sprite.js";
-import { Stage } from "./stage.js";
 import { Vector2 } from "./core/vector.js";
 import { State } from "./core/types.js";
-
-const FLY_MIN_DIST = 24;
 
 
 export class Player extends CollisionObject {
@@ -20,6 +17,10 @@ export class Player extends CollisionObject {
 
     private flappingArms : boolean;
     private running : boolean;
+    private climbing : boolean;
+    private touchLadder : boolean;
+    private isLadderTop : boolean;
+    private climbX : number;
 
     private flip : Flip;
 
@@ -28,10 +29,10 @@ export class Player extends CollisionObject {
 
         super(x, y);
 
-        this.friction = new Vector2(0.5, 0.5);
+        this.friction = new Vector2(0.40, 0.5);
         this.hitbox = new Vector2(80, 160);
         this.collisionBox = new Vector2(80, 160);
-        this.center = new Vector2(0, 32);
+        this.center = new Vector2(0, 16);
 
         this.canJump = false;
         this.jumpTimer = 0;
@@ -41,6 +42,10 @@ export class Player extends CollisionObject {
     
         this.flappingArms = false;
         this.running = false;
+        this.climbing = false;
+        this.touchLadder = false;
+        this.isLadderTop = false;
+        this.climbX = 0.0;
 
         this.flip = Flip.None;
     }
@@ -52,18 +57,61 @@ export class Player extends CollisionObject {
     }
 
 
-    private control(state : FrameState) {
+    private startClimbing(state : FrameState) {
 
-        const BASE_GRAVITY = 16.0;
-        const BASE_SPEED = 4.0;
-        const RUN_SPEED = 6.0;
+        let canGoDown = this.isLadderTop && this.canJump;
+
+        if (!this.climbing &&
+            this.touchLadder && 
+            (!this.isLadderTop && state.upPress() || 
+            (canGoDown && state.downPress()))) {
+
+            this.flappingArms = false;
+
+            this.climbing = true;
+            this.pos.x = this.climbX;
+
+            if (canGoDown) {
+
+                this.pos.y += 48;
+            }
+            this.stopMovement();
+            this.jumpTimer = 0;
+        }
+    }
+
+
+    private climb(state : FrameState) {
+
+        const EPS = 0.1;
+        const CLIMB_SPEED = 4.0;
+        const CLIB_JUMP_TIME = 12;
+
+        let jumpButtonState = state.getAction("fire1");
+
+        if (!this.touchLadder) {
+
+            this.climbing = false;
+        }
+        else {
+
+            this.target.y = CLIMB_SPEED * state.getStick().y;
+            if (jumpButtonState == State.Pressed) {
+
+                this.climbing = false;
+                if (state.getStick().y < EPS) {
+
+                    this.jumpTimer =  CLIB_JUMP_TIME;
+                }
+            }
+        }
+    }
+
+
+    private jump(state : FrameState) {
+
         const JUMP_TIME = 12;
         const FLAP_TIME = 45;
-        
-        this.running = (state.getAction("fire2") & State.DownOrPressed) == 1;
-
-        this.target.x = state.getStick().x * (this.running ? RUN_SPEED : BASE_SPEED);
-        this.target.y = BASE_GRAVITY;
 
         let jumpState = state.getAction("fire1");
 
@@ -85,6 +133,30 @@ export class Player extends CollisionObject {
 
             this.jumpTimer = 0;
         }
+    }
+
+
+    private control(state : FrameState) {
+
+        const BASE_GRAVITY = 16.0;
+        const BASE_SPEED = 4.0;
+        const RUN_SPEED = 8.0;
+
+        this.target.zeros();
+
+        this.startClimbing(state);
+        if (this.climbing) {
+
+            this.climb(state);
+            return;
+        }
+        
+        this.running = (state.getAction("fire2") & State.DownOrPressed) == 1;
+
+        this.target.x = state.getStick().x * (this.running ? RUN_SPEED : BASE_SPEED);
+        this.target.y = BASE_GRAVITY;
+
+        this.jump(state);
 
         this.target.x = computeFriction(this.target.x, 
             this.slopeFriction);
@@ -105,6 +177,15 @@ export class Player extends CollisionObject {
         let frame : number;
         let speed : number;
 
+        if (this.climbing) {
+
+            if (Math.abs(this.target.y) > EPS) {
+
+                this.spr.animate(2, 0, 3, 6, state.step);
+            }
+            return;
+        }
+
         if (this.flappingArms && this.jumpTimer > 0) {
 
             this.spr.animate(3, 0, 1, 4, state.step);
@@ -115,7 +196,7 @@ export class Player extends CollisionObject {
 
             if (Math.abs(this.target.x) > EPS) {
 
-                speed = 10 - Math.abs(this.speed.x);
+                speed = 12 - Math.abs(this.speed.x);
                 this.spr.animate(1, 0, 3, speed, state.step);
             }
             else {
@@ -171,8 +252,10 @@ export class Player extends CollisionObject {
         this.updateTimers(state);
 
         this.canJump = false;
-        this.slopeFriction = 0;
+        this.touchLadder = false;
+        this.isLadderTop = false;
 
+        this.slopeFriction = 0;
     }
 
 
@@ -200,10 +283,32 @@ export class Player extends CollisionObject {
             this.slopeFriction = friction;
 
             this.flappingArms = false;
+
+            this.climbing = false;
         }
         else {
 
             this.jumpTimer = 0;
         }
+    }
+
+
+    public ladderCollision(x : number, y : number, w : number, h : number, 
+        ladderTop : boolean, state : FrameState) : boolean {
+
+        const COLLISION_REDUCTION_X = 0.5;
+
+        let ladderBox = this.collisionBox.clone();
+        ladderBox.x *= COLLISION_REDUCTION_X;
+
+        if (boxOverlay(this.pos, this.center, ladderBox, x, y, w, h)) {
+
+            this.climbX = x + w/2;
+            this.touchLadder = true;
+            this.isLadderTop = this.isLadderTop || ladderTop;
+
+            return true;
+        }
+        return false;
     }
 }

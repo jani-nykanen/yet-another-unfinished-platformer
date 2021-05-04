@@ -1,4 +1,4 @@
-import { Vector2 } from "./core/vector.js";
+import { Rect, Vector2 } from "./core/vector.js";
 class Line {
     constructor(x1, y1, x2, y2) {
         this.A = new Vector2(x1, y1);
@@ -9,6 +9,7 @@ export class Stage {
     constructor(state, levelIndex) {
         this.hasLoaded = () => this.backgroundLoaded;
         this.slopes = new Array();
+        this.ladders = new Array();
         this.backgroundLoaded = false;
         this.scale = 1;
         this.parseJSON(state.getDocument(String(levelIndex)), state);
@@ -23,14 +24,22 @@ export class Stage {
         for (let s of data["slopes"]) {
             this.slopes.push(new Line(Number(s["x1"]), Number(s["y1"]), Number(s["x2"]), Number(s["y2"])));
         }
+        for (let s of data["ladders"]) {
+            this.ladders.push(new Rect(Number(s["x"]), Number(s["y"]), Number(s["w"]), Number(s["h"])));
+        }
     }
     update(state) {
         // ...
     }
     objectCollision(o, state) {
         const LEFT_COLLISION_MARGIN = 1024;
+        const LADDER_TOP_MARGIN = 16;
         for (let s of this.slopes) {
             o.slopeCollision(s.A.x, s.A.y, s.B.x, s.B.y, 1, state);
+        }
+        for (let l of this.ladders) {
+            o.ladderCollision(l.x, l.y, l.w, l.h, false, state);
+            o.ladderCollision(l.x, l.y, l.w, LADDER_TOP_MARGIN, true, state);
         }
         o.wallCollision(0, -LEFT_COLLISION_MARGIN, 768 + LEFT_COLLISION_MARGIN * 2, -1, state, true);
     }
