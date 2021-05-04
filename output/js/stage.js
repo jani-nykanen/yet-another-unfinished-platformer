@@ -1,51 +1,95 @@
 import { Rect, Vector2 } from "./core/vector.js";
 class Line {
-    constructor(x1, y1, x2, y2) {
+    constructor(x1, y1, x2, y2, dir) {
         this.A = new Vector2(x1, y1);
         this.B = new Vector2(x2, y2);
+        this.dir = dir;
+    }
+}
+class Wall {
+    constructor(x, y, h, dir) {
+        this.pos = new Vector2(x, y);
+        this.height = h;
+        this.dir = dir;
     }
 }
 export class Stage {
     constructor(state, levelIndex) {
         this.hasLoaded = () => this.backgroundLoaded;
+        this.getStartPosition = () => this.startPos.clone();
         this.slopes = new Array();
         this.ladders = new Array();
+        this.walls = new Array();
         this.backgroundLoaded = false;
         this.scale = 1;
         this.parseJSON(state.getDocument(String(levelIndex)), state);
+        this.stageIndex = levelIndex;
     }
-    parseJSON(source, state) {
+    parseJSON(source, state, destroyOldBackground = false) {
         let data = JSON.parse(source);
+        this.slopes = new Array();
+        this.ladders = new Array();
+        this.walls = new Array();
         state.loadBitmap(data["image"], bmp => {
             this.background = bmp;
             this.backgroundLoaded = true;
+            if (destroyOldBackground) {
+                this.backgroundBuffer.destroy();
+                this.backgroundBuffer = null;
+            }
         });
         this.scale = Number(data["scale"]);
-        for (let s of data["slopes"]) {
-            this.slopes.push(new Line(Number(s["x1"]), Number(s["y1"]), Number(s["x2"]), Number(s["y2"])));
+        if (data["slopes"] != undefined) {
+            for (let s of data["slopes"]) {
+                this.slopes.push(new Line(Number(s["x1"]) / this.scale, Number(s["y1"]) / this.scale, Number(s["x2"]) / this.scale, Number(s["y2"]) / this.scale, Number(s["dir"])));
+            }
         }
-        for (let s of data["ladders"]) {
-            this.ladders.push(new Rect(Number(s["x"]), Number(s["y"]), Number(s["w"]), Number(s["h"])));
+        if (data["ladders"] != undefined) {
+            for (let s of data["ladders"]) {
+                this.ladders.push(new Rect(Number(s["x"]) / this.scale, Number(s["y"]) / this.scale, Number(s["w"]) / this.scale, Number(s["h"]) / this.scale));
+            }
         }
+        if (data["walls"] != undefined) {
+            for (let s of data["walls"]) {
+                this.walls.push(new Wall(Number(s["x"]) / this.scale, Number(s["y"]) / this.scale, Number(s["h"]) / this.scale, Number(s["dir"])));
+            }
+        }
+        this.startPos = new Vector2(Number(data["startPos"]["x"]) / this.scale, Number(data["startPos"]["y"]) / this.scale);
+    }
+    nextStage(state) {
+        this.backgroundBuffer = this.background;
+        this.backgroundLoaded = false;
+        this.parseJSON(state.getDocument(String(this.stageIndex + 1)), state);
     }
     update(state) {
         // ...
     }
     objectCollision(o, state) {
-        const LEFT_COLLISION_MARGIN = 1024;
+        const SIDE_COLLISION_MARGIN = 1024;
         const LADDER_TOP_MARGIN = 16;
         for (let s of this.slopes) {
-            o.slopeCollision(s.A.x, s.A.y, s.B.x, s.B.y, 1, state);
+            o.slopeCollision(s.A.x, s.A.y, s.B.x, s.B.y, s.dir, state);
         }
         for (let l of this.ladders) {
             o.ladderCollision(l.x, l.y, l.w, l.h, false, state);
             o.ladderCollision(l.x, l.y, l.w, LADDER_TOP_MARGIN, true, state);
         }
-        o.wallCollision(0, -LEFT_COLLISION_MARGIN, 768 + LEFT_COLLISION_MARGIN * 2, -1, state, true);
+        for (let w of this.walls) {
+            o.wallCollision(w.pos.x, w.pos.y, w.height, w.dir, state);
+        }
+        o.wallCollision(0, -SIDE_COLLISION_MARGIN, 768 + SIDE_COLLISION_MARGIN * 2, -1, state, true);
+        if (o.wallCollision(1024 / this.scale, -SIDE_COLLISION_MARGIN, 768 + SIDE_COLLISION_MARGIN * 2, 1, state, true)) {
+            return true;
+        }
+        return false;
     }
     draw(canvas) {
         if (!this.backgroundLoaded)
             return;
         canvas.drawBitmap(this.background, 0, 0, canvas.width, canvas.height);
+    }
+    applyScale(canvas) {
+        canvas.transform.scale(this.scale, this.scale);
+        canvas.transform.use();
     }
 }

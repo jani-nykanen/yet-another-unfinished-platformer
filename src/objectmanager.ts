@@ -16,10 +16,28 @@ export class ObjectManager {
     }
 
 
-    public update(stage : Stage, state : FrameState) {
+    public setInitialState(stage : Stage) {
+
+        let p = stage.getStartPosition();
+        this.player.setPosition(p.x, p.y);
+    }
+
+
+    public update(stage : Stage, state : FrameState) : boolean {
 
         this.player.update(state);
-        stage.objectCollision(this.player, state);
+        if (stage.objectCollision(this.player, state)) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public transitionUpdate(state : FrameState) {
+
+        this.player.transitionUpdate(state);
     }
 
 

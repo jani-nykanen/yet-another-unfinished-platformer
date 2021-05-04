@@ -20,6 +20,7 @@
     "documentPath" : "assets/levels/",
     "documents" : [
 
-        {"name": "1", "path": "1.json"}
+        {"name": "1", "path": "1.json"},
+        {"name": "2", "path": "2.json"}
     ]
 }

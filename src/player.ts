@@ -29,7 +29,7 @@ export class Player extends CollisionObject {
 
         super(x, y);
 
-        this.friction = new Vector2(0.40, 0.5);
+        this.friction = new Vector2(0.40, 0.75);
         this.hitbox = new Vector2(80, 160);
         this.collisionBox = new Vector2(80, 160);
         this.center = new Vector2(0, 16);
@@ -111,7 +111,8 @@ export class Player extends CollisionObject {
     private jump(state : FrameState) {
 
         const JUMP_TIME = 12;
-        const FLAP_TIME = 45;
+        const FLAP_TIME = 60;
+        const SPEED_BONUS = 2.0;
 
         let jumpState = state.getAction("fire1");
 
@@ -128,6 +129,11 @@ export class Player extends CollisionObject {
 
             this.jumpTimer = this.flappingArms ? FLAP_TIME : JUMP_TIME;
             this.jumpMargin = 0;
+
+            if (!this.flappingArms) {
+
+                this.jumpTimer += Math.abs(this.speed.x) / SPEED_BONUS;
+            }
         }
         else if (this.jumpTimer > 0 && (jumpState & State.DownOrPressed) == 0) {
 
@@ -167,7 +173,7 @@ export class Player extends CollisionObject {
     private animate(state : FrameState) {
 
         const EPS = 0.01;
-        const JUMP_EPS = 2.0;
+        const JUMP_EPS = 3.0;
 
         if (Math.abs(this.target.x) > EPS) {
 
@@ -221,7 +227,7 @@ export class Player extends CollisionObject {
 
         const JUMP_SPEED = -12.0;
         const FLAP_SPEED = -1.0;
-        const FLAP_MIN_SPEED = -6.0;
+        const FLAP_MIN_SPEED = -4.0;
 
         if (this.jumpMargin > 0) {
 
@@ -256,6 +262,18 @@ export class Player extends CollisionObject {
         this.isLadderTop = false;
 
         this.slopeFriction = 0;
+    }
+
+
+    public transitionUpdate(state : FrameState) {
+
+        const MOVE_SPEED = 2.0;
+
+        this.animate(state);
+
+        this.target.x = MOVE_SPEED;
+        this.speed.x = MOVE_SPEED;
+        this.pos.x += this.speed.x * state.step;
     }
 
 
@@ -310,5 +328,26 @@ export class Player extends CollisionObject {
             return true;
         }
         return false;
+    }
+
+
+    public setPosition(x : number, y : number) {
+
+        this.stopMovement();
+        this.pos = new Vector2(x, y);
+
+        this.canJump = false;
+        this.jumpTimer = 0;
+        this.jumpMargin = 0;
+
+        this.spr.setFrame(0, 0);
+    
+        this.flappingArms = false;
+        this.running = false;
+        this.climbing = false;
+        this.touchLadder = false;
+        this.isLadderTop = false;
+
+        this.canJump = true;
     }
 }

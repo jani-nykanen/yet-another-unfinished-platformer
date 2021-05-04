@@ -1,5 +1,7 @@
 import { Canvas } from "./core/canvas.js";
 import { FrameState, Scene } from "./core/core.js";
+import { TransitionEffectType } from "./core/transition.js";
+import { RGBA } from "./core/vector.js";
 import { ObjectManager } from "./objectmanager.js";
 import { Stage } from "./stage.js";
 
@@ -15,12 +17,30 @@ export class GameScene implements Scene {
 
         this.objects = new ObjectManager();
         this.stage = new Stage(state, 1);
+
+        this.objects.setInitialState(this.stage);
     }   
 
 
     public update(state : FrameState) {
 
-        this.objects.update(this.stage, state);
+        if (state.transition.isActive()) {
+
+            this.objects.transitionUpdate(state);
+            return;
+        }
+
+        if (this.objects.update(this.stage, state)) {
+
+            state.transition.activate(true, TransitionEffectType.Fade,
+                1.0 / 30.0, state => {
+
+                    this.stage.nextStage(state);
+                    this.objects.setInitialState(this.stage);
+
+                }, new RGBA(1, 1, 1));
+        }
+
         this.stage.update(state);
     }
 
@@ -48,6 +68,7 @@ export class GameScene implements Scene {
         canvas.setDrawColor();
 
         this.stage.draw(canvas);
+        this.stage.applyScale(canvas);
         this.objects.draw(canvas);
 
         

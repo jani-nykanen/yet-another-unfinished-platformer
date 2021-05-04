@@ -90,6 +90,10 @@ export class TransitionEffectManager {
         if (!this.active || this.effectType == TransitionEffectType.None)
             return;
 
+        canvas.transform.loadIdentity();
+        canvas.transform.setView(canvas.width, canvas.height);
+        canvas.transform.use();
+
         let t = this.timer;
         if (this.fadeIn)
             t = 1.0 - t;
