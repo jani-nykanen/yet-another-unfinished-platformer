@@ -1,3 +1,4 @@
+import { Canvas } from "./canvas";
 
 
 export class Bitmap {
@@ -6,6 +7,8 @@ export class Bitmap {
 
     public readonly width : number;
     public readonly height : number;
+
+    private readonly gl : WebGLRenderingContext;
 
 
     constructor(gl : WebGLRenderingContext, image : HTMLImageElement, 
@@ -38,11 +41,34 @@ export class Bitmap {
             this.width = width;
             this.height = height;
         }
+
+        // Needed for destroying the texture...
+        this.gl = gl;
     }
 
 
     public bind(gl : WebGLRenderingContext) {
 
+        // We could have used the own reference to gl as well
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
     }
+
+
+    public destroy() {
+
+        this.gl.deleteTexture(this.texture);
+    }
 }
+
+
+// For loading non-global bitmaps only, otherwise use AssetPack
+export const loadBitmap = (canvas : Canvas, path : string, callback : (result : Bitmap) => void) => {
+
+    let image = new Image();
+        image.onload = () => {
+
+        callback(canvas.createBitmap(image));
+    }
+    image.src = path;
+} 
+

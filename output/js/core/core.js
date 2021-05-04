@@ -1,5 +1,6 @@
 import { AssetManager } from "./assets.js";
 import { AudioPlayer } from "./audioplayer.js";
+import { loadBitmap } from "./bitmap.js";
 import { Canvas } from "./canvas.js";
 import { InputManager } from "./input.js";
 import { TransitionEffectManager } from "./transition.js";
@@ -32,6 +33,9 @@ export class FrameState {
     setFilter(name, contrast = 0) {
         this.canvas.setFilterTexture(this.assets.getBitmap(name));
         this.canvas.setContrast(contrast);
+    }
+    loadBitmap(path, callback) {
+        loadBitmap(this.canvas, path, callback);
     }
 }
 export class Core {

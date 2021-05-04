@@ -16,8 +16,22 @@ export class Bitmap {
             this.width = width;
             this.height = height;
         }
+        // Needed for destroying the texture...
+        this.gl = gl;
     }
     bind(gl) {
+        // We could have used the own reference to gl as well
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
     }
+    destroy() {
+        this.gl.deleteTexture(this.texture);
+    }
 }
+// For loading non-global bitmaps only, otherwise use AssetPack
+export const loadBitmap = (canvas, path, callback) => {
+    let image = new Image();
+    image.onload = () => {
+        callback(canvas.createBitmap(image));
+    };
+    image.src = path;
+};

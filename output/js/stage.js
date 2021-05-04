@@ -7,11 +7,19 @@ class Line {
 }
 export class Stage {
     constructor(state, levelIndex) {
+        this.hasLoaded = () => this.backgroundLoaded;
         this.slopes = new Array();
-        this.parseJSON(state.getDocument("test"));
+        this.backgroundLoaded = false;
+        this.scale = 1;
+        this.parseJSON(state.getDocument(String(levelIndex)), state);
     }
-    parseJSON(source) {
+    parseJSON(source, state) {
         let data = JSON.parse(source);
+        state.loadBitmap(data["image"], bmp => {
+            this.background = bmp;
+            this.backgroundLoaded = true;
+        });
+        this.scale = Number(data["scale"]);
         for (let s of data["slopes"]) {
             this.slopes.push(new Line(Number(s["x1"]), Number(s["y1"]), Number(s["x2"]), Number(s["y2"])));
         }
@@ -27,6 +35,8 @@ export class Stage {
         o.wallCollision(0, -LEFT_COLLISION_MARGIN, 768 + LEFT_COLLISION_MARGIN * 2, -1, state, true);
     }
     draw(canvas) {
-        canvas.drawBitmap(canvas.getBitmap("testScene"), 0, 0, canvas.width, canvas.height);
+        if (!this.backgroundLoaded)
+            return;
+        canvas.drawBitmap(this.background, 0, 0, canvas.width, canvas.height);
     }
 }

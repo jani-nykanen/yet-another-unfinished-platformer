@@ -18,6 +18,9 @@ export class Player extends CollisionObject {
 
     private slopeFriction : number;
 
+    private flappingArms : boolean;
+    private running : boolean;
+
     private flip : Flip;
 
 
@@ -36,8 +39,10 @@ export class Player extends CollisionObject {
 
         this.spr = new Sprite(256, 256);
     
-        this.flip = Flip.None;
+        this.flappingArms = false;
+        this.running = false;
 
+        this.flip = Flip.None;
     }
 
 
@@ -51,17 +56,29 @@ export class Player extends CollisionObject {
 
         const BASE_GRAVITY = 16.0;
         const BASE_SPEED = 4.0;
+        const RUN_SPEED = 6.0;
         const JUMP_TIME = 12;
+        const FLAP_TIME = 45;
         
-        this.target.x = state.getStick().x * BASE_SPEED;
+        this.running = (state.getAction("fire2") & State.DownOrPressed) == 1;
+
+        this.target.x = state.getStick().x * (this.running ? RUN_SPEED : BASE_SPEED);
         this.target.y = BASE_GRAVITY;
 
         let jumpState = state.getAction("fire1");
 
-        // Normal & double jump
-        if ( (this.jumpMargin > 0) && jumpState == State.Pressed) {
+        let canFlapArms = this.jumpMargin <= 0 && !this.flappingArms;
 
-            this.jumpTimer = JUMP_TIME;
+        if ( (this.jumpMargin > 0 || canFlapArms) && 
+            jumpState == State.Pressed) {
+
+            if (canFlapArms) {
+
+                this.speed.y = Math.max(this.speed.y, 0);
+                this.flappingArms = true;
+            }
+
+            this.jumpTimer = this.flappingArms ? FLAP_TIME : JUMP_TIME;
             this.jumpMargin = 0;
         }
         else if (this.jumpTimer > 0 && (jumpState & State.DownOrPressed) == 0) {
@@ -87,6 +104,12 @@ export class Player extends CollisionObject {
 
         let frame : number;
         let speed : number;
+
+        if (this.flappingArms && this.jumpTimer > 0) {
+
+            this.spr.animate(3, 0, 1, 4, state.step);
+            return;
+        }
 
         if (this.canJump) {
 
@@ -116,11 +139,27 @@ export class Player extends CollisionObject {
     private updateTimers(state : FrameState) {
 
         const JUMP_SPEED = -12.0;
+        const FLAP_SPEED = -1.0;
+        const FLAP_MIN_SPEED = -6.0;
+
+        if (this.jumpMargin > 0) {
+
+            this.jumpMargin -= state.step;
+        }
 
         if (this.jumpTimer > 0) {
 
             this.jumpTimer -= state.step;
-            this.speed.y = JUMP_SPEED;
+
+            if (this.flappingArms) {
+                
+                this.speed.y = Math.max(FLAP_MIN_SPEED, 
+                    this.speed.y + FLAP_SPEED * state.step);
+            }
+            else {
+
+                this.speed.y = JUMP_SPEED;
+            }
         }
     }
 
@@ -151,7 +190,7 @@ export class Player extends CollisionObject {
 
     protected slopeCollisionEvent(dir : number, friction : number, state : FrameState) {
 
-        const JUMP_MARGIN = 12;
+        const JUMP_MARGIN = 15;
         if (dir > 0) {
 
             this.canJump = true;
@@ -159,6 +198,8 @@ export class Player extends CollisionObject {
             this.jumpMargin = JUMP_MARGIN;
 
             this.slopeFriction = friction;
+
+            this.flappingArms = false;
         }
         else {
 

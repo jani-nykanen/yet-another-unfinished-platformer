@@ -1,5 +1,6 @@
 import { AssetManager } from "./assets.js";
 import { AudioPlayer } from "./audioplayer.js";
+import { Bitmap, loadBitmap } from "./bitmap.js";
 import { Canvas } from "./canvas.js";
 import { InputManager } from "./input.js";
 import { AudioSample } from "./sample.js";
@@ -66,6 +67,12 @@ export class FrameState {
 
         this.canvas.setFilterTexture(this.assets.getBitmap(name));
         this.canvas.setContrast(contrast);
+    }
+
+
+    public loadBitmap(path : string, callback : (result : Bitmap) => void) {
+
+        loadBitmap(this.canvas, path, callback);        
     }
 
 

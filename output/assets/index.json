@@ -4,7 +4,6 @@
 
         {"name": "paperFilter",  "path": "paperfilter.jpg"},
         {"name": "player",  "path": "player.png"},
-        {"name": "testScene",  "path": "test_scene.jpg"},
         {"name": "font",  "path": "font.png"}
     ],
 
@@ -20,6 +19,7 @@
 
     "documentPath" : "assets/levels/",
     "documents" : [
-        {"name": "test", "path": "test.json"}
+
+        {"name": "1", "path": "1.json"}
     ]
 }

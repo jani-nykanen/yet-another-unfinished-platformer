@@ -1,3 +1,4 @@
+import { Bitmap } from "./core/bitmap.js";
 import { Canvas } from "./core/canvas.js";
 import { FrameState } from "./core/core.js";
 import { Vector2 } from "./core/vector.js";
@@ -25,18 +26,33 @@ export class Stage {
 
     private slopes : Array<Line>;
 
+    private backgroundLoaded : boolean;
+    private background : Bitmap;
+    private scale : number;
+
 
     constructor(state : FrameState, levelIndex : number) {
 
         this.slopes = new Array<Line> ();
 
-        this.parseJSON(state.getDocument("test"));
+        this.backgroundLoaded = false;
+        this.scale = 1;
+
+        this.parseJSON(state.getDocument(String(levelIndex)), state);
     }
 
 
-    private parseJSON(source : string) {
+    private parseJSON(source : string, state : FrameState) {
 
         let data = JSON.parse(source);
+
+        state.loadBitmap(data["image"], bmp => {
+
+            this.background = bmp;
+            this.backgroundLoaded = true;
+        });
+
+        this.scale = Number(data["scale"]);
 
         for (let s of data["slopes"]) {
 
@@ -69,7 +85,12 @@ export class Stage {
 
     public draw(canvas : Canvas) {
 
-        canvas.drawBitmap(canvas.getBitmap("testScene"), 
+        if (!this.backgroundLoaded) return;
+
+        canvas.drawBitmap(this.background, 
             0, 0, canvas.width, canvas.height);
     }
+
+
+    public hasLoaded = () : boolean => this.backgroundLoaded;
 }
