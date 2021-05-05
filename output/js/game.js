@@ -5,7 +5,7 @@ import { Stage } from "./stage.js";
 export class GameScene {
     constructor(param, state) {
         this.objects = new ObjectManager();
-        this.stage = new Stage(state, 1);
+        this.stage = new Stage(this.objects, state, 1);
         this.objects.setInitialState(this.stage);
     }
     update(state) {
@@ -15,7 +15,8 @@ export class GameScene {
         }
         if (this.objects.update(this.stage, state)) {
             state.transition.activate(true, TransitionEffectType.Fade, 1.0 / 30.0, state => {
-                this.stage.nextStage(state);
+                this.objects.resetEnemyArray();
+                this.stage.nextStage(this.objects, state);
                 this.objects.setInitialState(this.stage);
             }, new RGBA(1, 1, 1));
         }

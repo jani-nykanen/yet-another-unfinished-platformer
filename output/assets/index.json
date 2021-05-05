@@ -4,6 +4,9 @@
 
         {"name": "paperFilter",  "path": "paperfilter.jpg"},
         {"name": "player",  "path": "player.png"},
+        {"name": "dust",  "path": "dust.png"},
+        {"name": "enemies",  "path": "enemies.png"},
+        {"name": "poof",  "path": "poof.png"},
         {"name": "font",  "path": "font.png"}
     ],
 

@@ -37,6 +37,9 @@ export class ExistingObject {
         this.doesExist = () => this.exist;
         this.exist = false;
     }
+    forceKill() {
+        this.exist = false;
+    }
 }
 export function nextObject(arr, type) {
     let o;
@@ -133,11 +136,11 @@ export class CollisionObject extends GameObject {
         this.getCollisionBox = () => this.collisionBox.clone();
         this.doesCollideIfDying = () => this.collideIfDying;
         this.collisionBox = new Vector2();
-        this.bounceFactor = 0;
+        this.bounceFactor = new Vector2();
         this.collideIfDying = false;
         this.disableCollisions = false;
     }
-    wallCollisionstateent(dir, state) { }
+    wallCollisionEvent(dir, state) { }
     slopeCollisionEvent(dir, friction, state) { }
     wallCollision(x, y, h, dir, state, force = false) {
         const EPS = 0.001;
@@ -160,8 +163,8 @@ export class CollisionObject extends GameObject {
             (dir < 0 && nearNew <= x + NEAR_MARGIN * state.step &&
                 nearOld >= x - (FAR_MARGIN - this.speed.x) * state.step)) {
             this.pos.x = x - xoff;
-            this.speed.x *= -this.bounceFactor;
-            this.wallCollisionstateent(dir, state);
+            this.speed.x *= -this.bounceFactor.x;
+            this.wallCollisionEvent(dir, state);
             return true;
         }
         return false;
@@ -185,7 +188,7 @@ export class CollisionObject extends GameObject {
             (dir < 0 && py < y0 + NEAR_MARGIN * state.step &&
                 py >= y0 + (this.speed.y - FAR_MARGIN) * state.step)) {
             this.pos.y = y0 - this.center.y - dir * this.collisionBox.y / 2;
-            this.speed.y *= -this.bounceFactor;
+            this.speed.y *= -this.bounceFactor.y;
             this.slopeCollisionEvent(dir, k, state);
             return true;
         }

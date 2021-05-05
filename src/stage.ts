@@ -3,6 +3,7 @@ import { Canvas } from "./core/canvas.js";
 import { FrameState } from "./core/core.js";
 import { Rect, Vector2 } from "./core/vector.js";
 import { CollisionObject } from "./gameobject.js";
+import { ObjectManager } from "./objectmanager.js";
 
 
 
@@ -46,6 +47,7 @@ export class Stage {
     private slopes : Array<Line>;
     private ladders : Array<Rect>;
     private walls : Array<Wall>;
+    private enemyWalls : Array<Wall>;
 
     private backgroundLoaded : boolean;
     private background : Bitmap;
@@ -56,22 +58,39 @@ export class Stage {
     private stageIndex : number;
 
 
-    constructor(state : FrameState, levelIndex : number) {
+    constructor(objects : ObjectManager, state : FrameState, levelIndex : number) {
 
         this.slopes = new Array<Line> ();
         this.ladders = new Array<Rect> ();
         this.walls = new Array<Wall> ();
+        this.enemyWalls = new Array<Wall> ();
 
         this.backgroundLoaded = false;
         this.scale = 1;
 
-        this.parseJSON(state.getDocument(String(levelIndex)), state);
+        this.parseJSON(state.getDocument(String(levelIndex)), objects, state);
 
         this.stageIndex = levelIndex;
     }
 
 
-    private parseJSON(source : string, state : FrameState, 
+    private parseWalls(data : any, name : string, arr : Array<Wall>) {
+
+        if (data[name] != undefined) {
+
+            for (let s of data[name]) {
+
+                arr.push(new Wall(
+                    Number(s["x"]) / this.scale, Number(s["y"]) / this.scale, 
+                    Number(s["h"]) / this.scale, Number(s["dir"])
+                ));
+            }
+        }
+    }
+
+
+    private parseJSON(source : string,
+        objects : ObjectManager, state : FrameState, 
         destroyOldBackground = false) {
 
         let data = JSON.parse(source);
@@ -79,6 +98,7 @@ export class Stage {
         this.slopes = new Array<Line> ();
         this.ladders = new Array<Rect> ();
         this.walls = new Array<Wall> ();
+        this.enemyWalls = new Array<Wall> ();
 
         state.loadBitmap(data["image"], bmp => {
 
@@ -117,14 +137,17 @@ export class Stage {
             }
         }
 
-        if (data["walls"] != undefined) {
+        this.parseWalls(data, "walls", this.walls);
+        this.parseWalls(data, "enemyWalls", this.enemyWalls);
 
-            for (let s of data["walls"]) {
+        if (data["enemies"] != undefined) {
 
-                this.walls.push(new Wall(
-                    Number(s["x"]) / this.scale, Number(s["y"]) / this.scale, 
-                    Number(s["h"]) / this.scale, Number(s["dir"])
-                ));
+            for (let e of data["enemies"]) {
+
+                objects.addEnemy(
+                    Number(e["x"]) / this.scale, 
+                    Number(e["y"]) / this.scale,
+                    Number(e["id"]));
             }
         }
 
@@ -134,12 +157,12 @@ export class Stage {
     }
 
 
-    public nextStage(state : FrameState) {
+    public nextStage(objects : ObjectManager, state : FrameState) {
 
         this.backgroundBuffer = this.background;
 
         this.backgroundLoaded = false;
-        this.parseJSON(state.getDocument(String(this.stageIndex + 1)), state);
+        this.parseJSON(state.getDocument(String(this.stageIndex + 1)), objects, state);
     }
 
 
@@ -149,7 +172,7 @@ export class Stage {
     }
 
 
-    public objectCollision(o : CollisionObject, state : FrameState) : boolean {
+    public objectCollision(o : CollisionObject, state : FrameState, isEnemy = false) : boolean {
 
         const SIDE_COLLISION_MARGIN = 1024;
         const LADDER_TOP_MARGIN = 16;
@@ -168,6 +191,14 @@ export class Stage {
         for (let w of this.walls) {
 
             o.wallCollision(w.pos.x, w.pos.y, w.height, w.dir, state);
+        }
+
+        if (isEnemy) {
+
+            for (let w of this.enemyWalls) {
+
+                o.wallCollision(w.pos.x, w.pos.y, w.height, w.dir, state);
+            }
         }
 
         o.wallCollision(0, -SIDE_COLLISION_MARGIN, 

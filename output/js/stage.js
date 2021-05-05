@@ -14,22 +14,31 @@ class Wall {
     }
 }
 export class Stage {
-    constructor(state, levelIndex) {
+    constructor(objects, state, levelIndex) {
         this.hasLoaded = () => this.backgroundLoaded;
         this.getStartPosition = () => this.startPos.clone();
         this.slopes = new Array();
         this.ladders = new Array();
         this.walls = new Array();
+        this.enemyWalls = new Array();
         this.backgroundLoaded = false;
         this.scale = 1;
-        this.parseJSON(state.getDocument(String(levelIndex)), state);
+        this.parseJSON(state.getDocument(String(levelIndex)), objects, state);
         this.stageIndex = levelIndex;
     }
-    parseJSON(source, state, destroyOldBackground = false) {
+    parseWalls(data, name, arr) {
+        if (data[name] != undefined) {
+            for (let s of data[name]) {
+                arr.push(new Wall(Number(s["x"]) / this.scale, Number(s["y"]) / this.scale, Number(s["h"]) / this.scale, Number(s["dir"])));
+            }
+        }
+    }
+    parseJSON(source, objects, state, destroyOldBackground = false) {
         let data = JSON.parse(source);
         this.slopes = new Array();
         this.ladders = new Array();
         this.walls = new Array();
+        this.enemyWalls = new Array();
         state.loadBitmap(data["image"], bmp => {
             this.background = bmp;
             this.backgroundLoaded = true;
@@ -49,22 +58,24 @@ export class Stage {
                 this.ladders.push(new Rect(Number(s["x"]) / this.scale, Number(s["y"]) / this.scale, Number(s["w"]) / this.scale, Number(s["h"]) / this.scale));
             }
         }
-        if (data["walls"] != undefined) {
-            for (let s of data["walls"]) {
-                this.walls.push(new Wall(Number(s["x"]) / this.scale, Number(s["y"]) / this.scale, Number(s["h"]) / this.scale, Number(s["dir"])));
+        this.parseWalls(data, "walls", this.walls);
+        this.parseWalls(data, "enemyWalls", this.enemyWalls);
+        if (data["enemies"] != undefined) {
+            for (let e of data["enemies"]) {
+                objects.addEnemy(Number(e["x"]) / this.scale, Number(e["y"]) / this.scale, Number(e["id"]));
             }
         }
         this.startPos = new Vector2(Number(data["startPos"]["x"]) / this.scale, Number(data["startPos"]["y"]) / this.scale);
     }
-    nextStage(state) {
+    nextStage(objects, state) {
         this.backgroundBuffer = this.background;
         this.backgroundLoaded = false;
-        this.parseJSON(state.getDocument(String(this.stageIndex + 1)), state);
+        this.parseJSON(state.getDocument(String(this.stageIndex + 1)), objects, state);
     }
     update(state) {
         // ...
     }
-    objectCollision(o, state) {
+    objectCollision(o, state, isEnemy = false) {
         const SIDE_COLLISION_MARGIN = 1024;
         const LADDER_TOP_MARGIN = 16;
         for (let s of this.slopes) {
@@ -76,6 +87,11 @@ export class Stage {
         }
         for (let w of this.walls) {
             o.wallCollision(w.pos.x, w.pos.y, w.height, w.dir, state);
+        }
+        if (isEnemy) {
+            for (let w of this.enemyWalls) {
+                o.wallCollision(w.pos.x, w.pos.y, w.height, w.dir, state);
+            }
         }
         o.wallCollision(0, -SIDE_COLLISION_MARGIN, 768 + SIDE_COLLISION_MARGIN * 2, -1, state, true);
         if (o.wallCollision(1024 / this.scale, -SIDE_COLLISION_MARGIN, 768 + SIDE_COLLISION_MARGIN * 2, 1, state, true)) {

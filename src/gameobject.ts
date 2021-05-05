@@ -73,6 +73,12 @@ export abstract class ExistingObject {
 
         this.exist = false;
     }
+
+
+    public forceKill() {
+
+        this.exist = false;
+    }
     
 
     public doesExist = () : boolean => this.exist;
@@ -258,7 +264,7 @@ export abstract class CollisionObject extends GameObject {
 
 
     protected collisionBox : Vector2;
-    protected bounceFactor : number;
+    protected bounceFactor : Vector2;
     protected disableCollisions : boolean;
     protected collideIfDying : boolean;
 
@@ -268,14 +274,14 @@ export abstract class CollisionObject extends GameObject {
         super(x, y);
 
         this.collisionBox = new Vector2();
-        this.bounceFactor = 0;
+        this.bounceFactor = new Vector2();
 
         this.collideIfDying = false;
         this.disableCollisions = false;
     }
 
 
-    protected wallCollisionstateent(dir : number, state : FrameState) {}
+    protected wallCollisionEvent(dir : number, state : FrameState) {}
     protected slopeCollisionEvent(dir : number, friction : number, state : FrameState) {}
 
 
@@ -309,9 +315,9 @@ export abstract class CollisionObject extends GameObject {
              nearOld >= x - (FAR_MARGIN - this.speed.x)*state.step)) {
 
             this.pos.x = x - xoff;
-            this.speed.x *= -this.bounceFactor;
+            this.speed.x *= -this.bounceFactor.x;
 
-            this.wallCollisionstateent(dir, state);
+            this.wallCollisionEvent(dir, state);
 
             return true;
         }
@@ -347,7 +353,7 @@ export abstract class CollisionObject extends GameObject {
             py >= y0 + (this.speed.y - FAR_MARGIN) * state.step) ) {
 
             this.pos.y = y0 - this.center.y - dir*this.collisionBox.y/2;
-            this.speed.y *= -this.bounceFactor;
+            this.speed.y *= -this.bounceFactor.y;
 
             this.slopeCollisionEvent(dir, k, state);
 

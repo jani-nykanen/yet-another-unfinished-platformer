@@ -1,9 +1,10 @@
 import { Canvas, Flip } from "./core/canvas.js";
 import { FrameState } from "./core/core.js";
-import { boxOverlay, CollisionObject, computeFriction } from "./gameobject.js";
+import { boxOverlay, CollisionObject, computeFriction, nextObject } from "./gameobject.js";
 import { Sprite } from "./core/sprite.js";
 import { Vector2 } from "./core/vector.js";
 import { State } from "./core/types.js";
+import { Dust } from "./dust.js";
 
 
 export class Player extends CollisionObject {
@@ -24,10 +25,19 @@ export class Player extends CollisionObject {
 
     private flip : Flip;
 
+    private dust : Array<Dust>;
+    private dustTimer : number;
+
+    private startPos : Vector2;
+    private respawnTimer : number;
+
 
     constructor(x : number, y : number) {
 
         super(x, y);
+
+        this.startPos = this.pos.clone();
+        this.respawnTimer = 0;
 
         this.friction = new Vector2(0.40, 0.75);
         this.hitbox = new Vector2(80, 160);
@@ -47,13 +57,20 @@ export class Player extends CollisionObject {
         this.isLadderTop = false;
         this.climbX = 0.0;
 
+        this.dustTimer = 0;
+        this.dust = new Array<Dust> ();
+
         this.flip = Flip.None;
     }
 
 
     protected die(state : FrameState) {
 
-        return true;
+        this.spr.animate(0, 0, 4, 5, state.step);
+
+        this.updateDust(state);
+
+        return this.spr.getColumn() == 4;
     }
 
 
@@ -170,6 +187,34 @@ export class Player extends CollisionObject {
     }
 
 
+    private updateDust(state : FrameState) {
+
+        const DUST_TIME = 12;
+        const DUST_SPEED = 6;
+        const EPS = 0.1;
+
+        for (let d of this.dust) {
+
+            d.update(state);
+        }
+
+        if (this.dying || !this.canJump || Math.abs(this.speed.x) <= EPS) {
+
+            this.dustTimer = 0;
+            return;
+        }            
+
+        if ((this.dustTimer += Math.abs(this.speed.x / 4.0) * state.step) >= DUST_TIME) {
+
+            nextObject<Dust>(this.dust, Dust)   
+                .spawn(this.pos.x - Math.sign(this.speed.x) * 48, 
+                    this.pos.y + 80, DUST_SPEED);
+
+            this.dustTimer -= DUST_TIME;
+        }
+    }
+
+
     private animate(state : FrameState) {
 
         const EPS = 0.01;
@@ -225,7 +270,7 @@ export class Player extends CollisionObject {
 
     private updateTimers(state : FrameState) {
 
-        const JUMP_SPEED = -12.0;
+        const JUMP_SPEED = -13.0;
         const FLAP_SPEED = -1.0;
         const FLAP_MIN_SPEED = -4.0;
 
@@ -256,6 +301,7 @@ export class Player extends CollisionObject {
         this.control(state);
         this.animate(state);
         this.updateTimers(state);
+        this.updateDust(state);
 
         this.canJump = false;
         this.touchLadder = false;
@@ -269,17 +315,31 @@ export class Player extends CollisionObject {
 
         const MOVE_SPEED = 2.0;
 
+        this.updateDust(state);
         this.animate(state);
 
         this.target.x = MOVE_SPEED;
         this.speed.x = MOVE_SPEED;
         this.pos.x += this.speed.x * state.step;
+
+        this.startPos.x = this.pos.x;
+    }
+
+
+    public preDraw(canvas : Canvas) {
+
+        for (let d of this.dust) {
+
+            d.draw(canvas);
+        }
     }
 
 
     public draw(canvas : Canvas) {
 
-        let bmp = canvas.getBitmap("player");
+        if (!this.exist) return;
+
+        let bmp = canvas.getBitmap(this.dying ? "poof" : "player");
 
         canvas.drawSprite(this.spr, bmp, 
             this.pos.x - this.spr.width/2,
@@ -331,23 +391,59 @@ export class Player extends CollisionObject {
     }
 
 
-    public setPosition(x : number, y : number) {
+    private resetProperties() {
 
-        this.stopMovement();
-        this.pos = new Vector2(x, y);
-
-        this.canJump = false;
-        this.jumpTimer = 0;
-        this.jumpMargin = 0;
-
-        this.spr.setFrame(0, 0);
-    
         this.flappingArms = false;
         this.running = false;
         this.climbing = false;
         this.touchLadder = false;
         this.isLadderTop = false;
-
         this.canJump = true;
+        this.jumpTimer = 0;
+        this.jumpMargin = 0;
+        this.dustTimer = 0;
+
+        this.spr.setFrame(0, 0);
+    }
+
+
+    public setPosition(x : number, y : number) {
+
+        this.stopMovement();
+        this.pos = new Vector2(x, y);
+
+        this.resetProperties();
+
+        for (let d of this.dust) {
+
+            d.forceKill();
+        }
+
+        this.startPos = this.pos.clone();
+    }
+
+
+    public respawn(state : FrameState) {
+
+        const RESPAWN_TIME = 60;
+
+        this.pos = this.startPos.clone();
+
+        this.stopMovement();
+        this.resetProperties();
+
+        this.dying = false;
+        this.exist = true;
+
+        this.respawnTimer = RESPAWN_TIME;
+    }
+
+
+    public kill(state : FrameState) {
+
+        if (this.dying || !this.exist) return;
+
+        this.spr.setFrame(0, 0);
+        this.dying = true;
     }
 }

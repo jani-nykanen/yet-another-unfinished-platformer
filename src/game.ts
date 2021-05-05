@@ -16,7 +16,7 @@ export class GameScene implements Scene {
     constructor(param : any, state : FrameState) {
 
         this.objects = new ObjectManager();
-        this.stage = new Stage(state, 1);
+        this.stage = new Stage(this.objects, state, 1);
 
         this.objects.setInitialState(this.stage);
     }   
@@ -35,7 +35,8 @@ export class GameScene implements Scene {
             state.transition.activate(true, TransitionEffectType.Fade,
                 1.0 / 30.0, state => {
 
-                    this.stage.nextStage(state);
+                    this.objects.resetEnemyArray();
+                    this.stage.nextStage(this.objects, state);
                     this.objects.setInitialState(this.stage);
 
                 }, new RGBA(1, 1, 1));
@@ -70,8 +71,6 @@ export class GameScene implements Scene {
         this.stage.draw(canvas);
         this.stage.applyScale(canvas);
         this.objects.draw(canvas);
-
-        
     }
 
 
