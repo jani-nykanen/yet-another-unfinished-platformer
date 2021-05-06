@@ -8,11 +8,20 @@ export class GameScene {
         this.objects = new ObjectManager();
         this.stage = new Stage(this.objects, state, 1);
         this.objects.setInitialState(this.stage);
+        this.anyKeyPressed = false;
     }
     update(state) {
         if (state.transition.isActive()) {
             this.objects.transitionUpdate(state);
             return;
+        }
+        if (!this.anyKeyPressed) {
+            if (state.anyInputActionOccurred()) {
+                this.anyKeyPressed = true;
+            }
+            else {
+                return;
+            }
         }
         if (this.objects.update(this.stage, state)) {
             state.transition.activate(true, TransitionEffectType.Fade, 1.0 / 30.0, state => {

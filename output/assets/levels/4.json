@@ -1,0 +1,21 @@
+{
+    "image": "assets/levels/4.jpg",
+    "scale": 0.75,
+    "startPos": {"x": 0, "y": 230},
+
+    "slopes": [
+
+        {"x1": 0, "y1": 300, "x2": 316, "y2": 300, "dir": 1}
+       
+    ],
+
+    "walls": [
+
+        
+    ],
+
+    "enemies": [
+
+        {"x": 512, "y": 391, "id": 2}
+    ]
+}

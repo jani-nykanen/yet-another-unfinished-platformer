@@ -163,6 +163,8 @@ export class Stage {
 
         this.backgroundLoaded = false;
         this.parseJSON(state.getDocument(String(this.stageIndex + 1)), objects, state);
+
+        ++ this.stageIndex;
     }
 
 
@@ -199,6 +201,9 @@ export class Stage {
 
                 o.wallCollision(w.pos.x, w.pos.y, w.height, w.dir, state);
             }
+
+            o.constantSlopeCollision(0, 768 / this.scale, 2048, 1, false, false, state);
+            o.constantSlopeCollision(0, 0, 2048, -1, false, false, state);
         }
 
         o.wallCollision(0, -SIDE_COLLISION_MARGIN, 

@@ -51,6 +51,9 @@ export class FrameState {
     }
 
 
+    public anyInputActionOccurred = () : boolean => this.input.anyPressed();
+
+
     public leftPress = () : boolean => this.input.leftPress();
     public rightPress = () : boolean => this.input.rightPress();
     public upPress = () : boolean => this.input.upPress();

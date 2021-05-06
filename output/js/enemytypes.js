@@ -7,7 +7,7 @@ export const getEnemyType = (index) => ENEMY_TYPES()[clamp(index, 0, ENEMY_TYPES
 export class Snake extends Enemy {
     constructor(x, y) {
         super(x, y, 0, 0.90);
-        this.hitbox = new Vector2(128, 64);
+        this.hitbox = new Vector2(128, 48);
         this.collisionBox = new Vector2(128, 64);
         this.center = new Vector2(0, 32);
         this.friction.x = 1.0;
@@ -41,10 +41,10 @@ export class Snake extends Enemy {
 export class Dog extends Enemy {
     constructor(x, y) {
         const BASE_GRAVITY = 16.0;
-        super(x, y, 1, 0.90);
-        this.hitbox = new Vector2(96, 96);
+        super(x, y, 1, 0.80);
+        this.hitbox = new Vector2(64, 64);
         this.collisionBox = new Vector2(128, 128);
-        this.center = new Vector2(0, 24);
+        this.center = new Vector2(0, 0);
         this.target.y = BASE_GRAVITY;
         this.friction.y = 0.35;
         this.jumpTimer = Dog.JUMP_TIME +
@@ -82,7 +82,6 @@ export class Bird extends Enemy {
         const FLY_SPEED = 2.0;
         this.spr.animate(this.spr.getRow(), 0, 3, 6, state.step);
         this.speed.y = FLY_SPEED * this.dir;
-        this.constantSlopeCollision(0, 0, 2048, -1, false, false, state);
     }
     slopeCollisionEvent(dir, friction, state) {
         this.dir = -dir;

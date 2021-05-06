@@ -6,6 +6,7 @@ import { InputManager } from "./input.js";
 import { TransitionEffectManager } from "./transition.js";
 export class FrameState {
     constructor(step, core, input, assets, canvas, transition, audio) {
+        this.anyInputActionOccurred = () => this.input.anyPressed();
         this.leftPress = () => this.input.leftPress();
         this.rightPress = () => this.input.rightPress();
         this.upPress = () => this.input.upPress();

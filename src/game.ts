@@ -12,6 +12,8 @@ export class GameScene implements Scene {
     private objects : ObjectManager;
     private stage : Stage;
 
+    private anyKeyPressed : boolean;
+
 
     constructor(param : any, state : FrameState) {
 
@@ -22,6 +24,8 @@ export class GameScene implements Scene {
         this.stage = new Stage(this.objects, state, 1);
 
         this.objects.setInitialState(this.stage);
+
+        this.anyKeyPressed = false;
     }   
 
 
@@ -31,6 +35,18 @@ export class GameScene implements Scene {
 
             this.objects.transitionUpdate(state);
             return;
+        }
+
+        if (!this.anyKeyPressed) {
+
+            if (state.anyInputActionOccurred()) {
+
+                this.anyKeyPressed = true;
+            }
+            else {
+                
+                return;
+            }
         }
 
         if (this.objects.update(this.stage, state)) {
