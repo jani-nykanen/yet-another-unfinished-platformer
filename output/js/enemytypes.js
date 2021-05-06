@@ -2,7 +2,7 @@ import { Flip } from "./core/canvas.js";
 import { clamp } from "./core/mathext.js";
 import { Vector2 } from "./core/vector.js";
 import { Enemy } from "./enemy.js";
-const ENEMY_TYPES = () => [Snake, Dog];
+const ENEMY_TYPES = () => [Snake, Dog, Bird];
 export const getEnemyType = (index) => ENEMY_TYPES()[clamp(index, 0, ENEMY_TYPES().length - 1) | 0];
 export class Snake extends Enemy {
     constructor(x, y) {
@@ -42,7 +42,7 @@ export class Dog extends Enemy {
     constructor(x, y) {
         const BASE_GRAVITY = 16.0;
         super(x, y, 1, 0.90);
-        this.hitbox = new Vector2(128, 64);
+        this.hitbox = new Vector2(96, 96);
         this.collisionBox = new Vector2(128, 128);
         this.center = new Vector2(0, 24);
         this.target.y = BASE_GRAVITY;
@@ -71,3 +71,20 @@ export class Dog extends Enemy {
     }
 }
 Dog.JUMP_TIME = 60;
+export class Bird extends Enemy {
+    constructor(x, y) {
+        super(x, y, 2, 0.90);
+        this.hitbox = new Vector2(80, 80);
+        this.collisionBox = new Vector2(128, 128);
+        this.dir = ((y | 0) % 2) == 0 ? 1 : -1;
+    }
+    updateAI(state) {
+        const FLY_SPEED = 2.0;
+        this.spr.animate(this.spr.getRow(), 0, 3, 6, state.step);
+        this.speed.y = FLY_SPEED * this.dir;
+        this.constantSlopeCollision(0, 0, 2048, -1, false, false, state);
+    }
+    slopeCollisionEvent(dir, friction, state) {
+        this.dir = -dir;
+    }
+}

@@ -4,6 +4,7 @@ import { ObjectManager } from "./objectmanager.js";
 import { Stage } from "./stage.js";
 export class GameScene {
     constructor(param, state) {
+        state.transition.activate(false, TransitionEffectType.Fade, 1.0 / 30.0, null, new RGBA(1, 1, 1));
         this.objects = new ObjectManager();
         this.stage = new Stage(this.objects, state, 1);
         this.objects.setInitialState(this.stage);

@@ -8,7 +8,8 @@ export class Player extends CollisionObject {
     constructor(x, y) {
         super(x, y);
         this.startPos = this.pos.clone();
-        this.respawnTimer = 0;
+        this.respawning = true;
+        this.respawnType = 1;
         this.friction = new Vector2(0.40, 0.75);
         this.hitbox = new Vector2(80, 160);
         this.collisionBox = new Vector2(80, 160);
@@ -23,6 +24,7 @@ export class Player extends CollisionObject {
         this.touchLadder = false;
         this.isLadderTop = false;
         this.climbX = 0.0;
+        this.crouching = false;
         this.dustTimer = 0;
         this.dust = new Array();
         this.flip = Flip.None;
@@ -30,6 +32,7 @@ export class Player extends CollisionObject {
     die(state) {
         this.spr.animate(0, 0, 4, 5, state.step);
         this.updateDust(state);
+        this.flip = Flip.None;
         return this.spr.getColumn() == 4;
     }
     startClimbing(state) {
@@ -89,6 +92,7 @@ export class Player extends CollisionObject {
         }
     }
     control(state) {
+        const EPS = 0.5;
         const BASE_GRAVITY = 16.0;
         const BASE_SPEED = 4.0;
         const RUN_SPEED = 8.0;
@@ -103,6 +107,10 @@ export class Player extends CollisionObject {
         this.target.y = BASE_GRAVITY;
         this.jump(state);
         this.target.x = computeFriction(this.target.x, this.slopeFriction);
+        if (this.canJump && state.getStick().y > EPS) {
+            this.crouching = true;
+            this.target.x = 0;
+        }
     }
     updateDust(state) {
         const DUST_TIME = 12;
@@ -140,7 +148,10 @@ export class Player extends CollisionObject {
             return;
         }
         if (this.canJump) {
-            if (Math.abs(this.target.x) > EPS) {
+            if (this.crouching) {
+                this.spr.setFrame(3, 3);
+            }
+            else if (Math.abs(this.target.x) > EPS) {
                 speed = 12 - Math.abs(this.speed.x);
                 this.spr.animate(1, 0, 3, speed, state.step);
             }
@@ -174,7 +185,19 @@ export class Player extends CollisionObject {
             }
         }
     }
+    updateRespawning(state) {
+        this.spr.animate(4 + this.respawnType, 0, 4, 6, state.step);
+        if (this.spr.getColumn() == 4) {
+            this.spr.setFrame(0, 0);
+            this.respawning = false;
+            this.respawnType = 0;
+        }
+    }
     updateLogic(state) {
+        if (this.respawning) {
+            this.updateRespawning(state);
+            return;
+        }
         this.control(state);
         this.animate(state);
         this.updateTimers(state);
@@ -182,10 +205,17 @@ export class Player extends CollisionObject {
         this.canJump = false;
         this.touchLadder = false;
         this.isLadderTop = false;
+        this.crouching = false;
         this.slopeFriction = 0;
     }
     transitionUpdate(state) {
-        const MOVE_SPEED = 2.0;
+        const MOVE_SPEED = 2.5;
+        if (this.respawning)
+            return;
+        if (!this.canJump) {
+            this.flappingArms = true;
+            this.jumpTimer = 1;
+        }
         this.updateDust(state);
         this.animate(state);
         this.target.x = MOVE_SPEED;
@@ -240,7 +270,13 @@ export class Player extends CollisionObject {
         this.jumpTimer = 0;
         this.jumpMargin = 0;
         this.dustTimer = 0;
-        this.spr.setFrame(0, 0);
+        this.crouching = false;
+        if (this.respawning) {
+            this.spr.setFrame(0, 5);
+        }
+        else {
+            this.spr.setFrame(0, 0);
+        }
     }
     setPosition(x, y) {
         this.stopMovement();
@@ -252,13 +288,12 @@ export class Player extends CollisionObject {
         this.startPos = this.pos.clone();
     }
     respawn(state) {
-        const RESPAWN_TIME = 60;
         this.pos = this.startPos.clone();
         this.stopMovement();
         this.resetProperties();
         this.dying = false;
         this.exist = true;
-        this.respawnTimer = RESPAWN_TIME;
+        this.respawning = true;
     }
     kill(state) {
         if (this.dying || !this.exist)

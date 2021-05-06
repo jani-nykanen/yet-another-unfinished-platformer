@@ -1,7 +1,7 @@
 {
     "image": "assets/levels/1.jpg",
     "scale": 1.0,
-    "startPos": {"x": 400, "y": 576},
+    "startPos": {"x": 400, "y": 580},
  
     "slopes": [
         

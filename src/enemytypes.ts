@@ -6,7 +6,7 @@ import { Enemy } from "./enemy.js";
 import { Player } from "./player.js";
 
 
-const ENEMY_TYPES = () : Array<Function> => [Snake, Dog];
+const ENEMY_TYPES = () : Array<Function> => [Snake, Dog, Bird];
 
 export const getEnemyType = (index : number) : Function => ENEMY_TYPES()
     [clamp(index, 0, ENEMY_TYPES().length-1) | 0];
@@ -89,7 +89,7 @@ export class Dog extends Enemy {
 
         super(x, y, 1, 0.90);
 
-        this.hitbox = new Vector2(128, 64);
+        this.hitbox = new Vector2(96, 96);
         this.collisionBox = new Vector2(128, 128);
 
         this.center = new Vector2(0, 24);
@@ -129,5 +129,38 @@ export class Dog extends Enemy {
     protected playerEvent(player : Player, state : FrameState) {
 
         this.flip = player.getPos().x < this.pos.x ? Flip.None : Flip.Horizontal;
+    }
+}
+
+
+export class Bird extends Enemy {
+
+
+    constructor(x : number, y : number) {
+
+        super(x, y, 2, 0.90);
+
+        this.hitbox = new Vector2(80, 80);
+        this.collisionBox = new Vector2(128, 128);
+
+        this.dir = ((y | 0) % 2) == 0 ? 1 : -1;
+    }
+
+
+    protected updateAI(state : FrameState) {
+
+        const FLY_SPEED = 2.0;
+
+        this.spr.animate(this.spr.getRow(), 0, 3, 6, state.step);
+
+        this.speed.y = FLY_SPEED * this.dir;
+
+        this.constantSlopeCollision(0, 0, 2048, -1, false, false, state);
+    }
+
+
+    protected slopeCollisionEvent(dir : number, friction : number, state : FrameState) {
+
+        this.dir = -dir;
     }
 }
