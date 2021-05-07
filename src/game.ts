@@ -25,7 +25,7 @@ export class GameScene implements Scene {
 
         this.objects.setInitialState(this.stage);
 
-        this.anyKeyPressed = false;
+        this.anyKeyPressed = true; // false;
     }   
 
 

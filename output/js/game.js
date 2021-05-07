@@ -8,7 +8,7 @@ export class GameScene {
         this.objects = new ObjectManager();
         this.stage = new Stage(this.objects, state, 1);
         this.objects.setInitialState(this.stage);
-        this.anyKeyPressed = false;
+        this.anyKeyPressed = true; // false;
     }
     update(state) {
         if (state.transition.isActive()) {

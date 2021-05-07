@@ -322,6 +322,8 @@ export class Player extends CollisionObject {
             this.respawning = false;
             this.respawnType = 0;
         }
+
+        this.flip = Flip.None;
     }
 
 

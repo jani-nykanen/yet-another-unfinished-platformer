@@ -79,6 +79,8 @@ export class Stage {
     objectCollision(o, state, isEnemy = false) {
         const SIDE_COLLISION_MARGIN = 1024;
         const LADDER_TOP_MARGIN = 16;
+        if (o.isDying() || !o.doesExist())
+            return;
         for (let s of this.slopes) {
             o.slopeCollision(s.A.x, s.A.y, s.B.x, s.B.y, s.dir, state);
         }
@@ -95,6 +97,11 @@ export class Stage {
             }
             o.constantSlopeCollision(0, 768 / this.scale, 2048, 1, false, false, state);
             o.constantSlopeCollision(0, 0, 2048, -1, false, false, state);
+        }
+        else {
+            if (o.getPos().y - o.getHitbox().y > 768 / this.scale) {
+                o.forceKill();
+            }
         }
         o.wallCollision(0, -SIDE_COLLISION_MARGIN, 768 + SIDE_COLLISION_MARGIN * 2, -1, state, true);
         if (o.wallCollision(1024 / this.scale, -SIDE_COLLISION_MARGIN, 768 + SIDE_COLLISION_MARGIN * 2, 1, state, true)) {
