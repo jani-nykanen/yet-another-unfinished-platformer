@@ -90,6 +90,11 @@ export class GameScene implements Scene {
         this.stage.draw(canvas);
         this.stage.applyScale(canvas);
         this.objects.draw(canvas);
+
+        canvas.transform.loadIdentity();
+        canvas.transform.use();
+
+        this.stage.postDraw(canvas);
     }
 
 

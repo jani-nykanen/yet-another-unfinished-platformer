@@ -2,7 +2,8 @@ import { Bitmap } from "./core/bitmap.js";
 import { Canvas } from "./core/canvas.js";
 import { FrameState } from "./core/core.js";
 import { Rect, Vector2 } from "./core/vector.js";
-import { CollisionObject } from "./gameobject.js";
+import { CollisionObject, nextObject } from "./gameobject.js";
+import { Leaf } from "./leaf.js";
 import { ObjectManager } from "./objectmanager.js";
 
 
@@ -57,6 +58,10 @@ export class Stage {
 
     private stageIndex : number;
 
+    private leaves : Array<Leaf>;
+    private leafTimer : number;
+    private hasLeaves : boolean;
+
 
     constructor(objects : ObjectManager, state : FrameState, levelIndex : number) {
 
@@ -67,6 +72,10 @@ export class Stage {
 
         this.backgroundLoaded = false;
         this.scale = 1;
+
+        this.leaves = new Array<Leaf> ();
+        this.leafTimer = 0.0;
+        this.hasLeaves = false;
 
         this.parseJSON(state.getDocument(String(levelIndex)), objects, state);
 
@@ -94,6 +103,9 @@ export class Stage {
         destroyOldBackground = false) {
 
         let data = JSON.parse(source);
+
+        this.leaves = new Array<Leaf> ();
+        this.leafTimer = 0.0;
 
         this.slopes = new Array<Line> ();
         this.ladders = new Array<Rect> ();
@@ -154,6 +166,13 @@ export class Stage {
         this.startPos = new Vector2(
             Number(data["startPos"]["x"]) / this.scale, 
             Number(data["startPos"]["y"]) / this.scale);
+
+        this.hasLeaves = data["hasLeaves"] != undefined && Boolean(data["hasLeaves"]);
+            
+        if (data["hasInitialLeaves"] != undefined && (data["hasInitialLeaves"])) {
+
+            this.generateInitialLeaves();
+        }
     }
 
 
@@ -168,9 +187,62 @@ export class Stage {
     }
 
 
+    private generateInitialLeaves() {
+
+        const MIN_COUNT = 4;
+        const MAX_COUNT = 8;
+
+        let count = MIN_COUNT + ((Math.random() * (MAX_COUNT - MIN_COUNT)) | 0);
+        for (let i = 0; i < count; ++ i) {
+
+            this.generateLeaf(Math.random() * 768);
+        }
+    }
+
+
+    private generateLeaf(dy = -64) {
+
+        const MIN_SPEED_X = 2;
+        const MAX_SPEED_X = 4;
+        const MIN_SPEED_Y = 2;
+        const MAX_SPEED_Y = 6;
+
+        let speedY = MIN_SPEED_Y + Math.random() * (MAX_SPEED_Y - MIN_SPEED_Y);
+        let speedX = MIN_SPEED_X + Math.random() * (MAX_SPEED_X - MIN_SPEED_X);
+
+        let x = 64 + Math.random() * (1024 - 128);
+        let y = dy;
+
+        nextObject(this.leaves, Leaf)
+            .spawn(x, y, (Math.random() * 4) | 0,
+            speedX, speedY);    
+    }
+
+
+    private updateLeaves(state : FrameState) {
+
+        const LEAF_TIME = 60;
+
+        if ((this.leafTimer -= state.step) <= 0) {
+
+            this.generateLeaf();
+            this.leafTimer += LEAF_TIME;
+        }
+
+        for (let l of this.leaves) {
+
+            l.update(state);
+        }
+    }
+
+
+
     public update(state : FrameState) {
 
-        // ...
+        if (this.hasLeaves) {
+            
+            this.updateLeaves(state);
+        }
     }
 
 
@@ -236,6 +308,15 @@ export class Stage {
 
         canvas.drawBitmap(this.background, 
             0, 0, canvas.width, canvas.height);
+    }
+
+
+    public postDraw(canvas : Canvas) {
+
+        for (let l of this.leaves) {
+
+            l.draw(canvas);
+        }
     }
 
 

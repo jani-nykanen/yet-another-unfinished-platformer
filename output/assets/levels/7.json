@@ -3,6 +3,9 @@
     "scale": 0.75,
     "startPos": {"x": 0, "y": 600},
 
+    "hasLeaves": true,
+    "hasInitialLeaves": true,
+
     "slopes": [
 
         {"x1": 0, "y1": 672, "x2": 1024, "y2": 672, "dir": 1},

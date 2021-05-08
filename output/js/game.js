@@ -49,6 +49,9 @@ export class GameScene {
         this.stage.draw(canvas);
         this.stage.applyScale(canvas);
         this.objects.draw(canvas);
+        canvas.transform.loadIdentity();
+        canvas.transform.use();
+        this.stage.postDraw(canvas);
     }
     dispose() {
         return null;

@@ -1,4 +1,6 @@
 import { Rect, Vector2 } from "./core/vector.js";
+import { nextObject } from "./gameobject.js";
+import { Leaf } from "./leaf.js";
 class Line {
     constructor(x1, y1, x2, y2, dir) {
         this.A = new Vector2(x1, y1);
@@ -23,6 +25,9 @@ export class Stage {
         this.enemyWalls = new Array();
         this.backgroundLoaded = false;
         this.scale = 1;
+        this.leaves = new Array();
+        this.leafTimer = 0.0;
+        this.hasLeaves = false;
         this.parseJSON(state.getDocument(String(levelIndex)), objects, state);
         this.stageIndex = levelIndex;
     }
@@ -35,6 +40,8 @@ export class Stage {
     }
     parseJSON(source, objects, state, destroyOldBackground = false) {
         let data = JSON.parse(source);
+        this.leaves = new Array();
+        this.leafTimer = 0.0;
         this.slopes = new Array();
         this.ladders = new Array();
         this.walls = new Array();
@@ -66,6 +73,10 @@ export class Stage {
             }
         }
         this.startPos = new Vector2(Number(data["startPos"]["x"]) / this.scale, Number(data["startPos"]["y"]) / this.scale);
+        this.hasLeaves = data["hasLeaves"] != undefined && Boolean(data["hasLeaves"]);
+        if (data["hasInitialLeaves"] != undefined && (data["hasInitialLeaves"])) {
+            this.generateInitialLeaves();
+        }
     }
     nextStage(objects, state) {
         this.backgroundBuffer = this.background;
@@ -73,8 +84,40 @@ export class Stage {
         this.parseJSON(state.getDocument(String(this.stageIndex + 1)), objects, state);
         ++this.stageIndex;
     }
+    generateInitialLeaves() {
+        const MIN_COUNT = 4;
+        const MAX_COUNT = 8;
+        let count = MIN_COUNT + ((Math.random() * (MAX_COUNT - MIN_COUNT)) | 0);
+        for (let i = 0; i < count; ++i) {
+            this.generateLeaf(Math.random() * 768);
+        }
+    }
+    generateLeaf(dy = -64) {
+        const MIN_SPEED_X = 2;
+        const MAX_SPEED_X = 4;
+        const MIN_SPEED_Y = 2;
+        const MAX_SPEED_Y = 6;
+        let speedY = MIN_SPEED_Y + Math.random() * (MAX_SPEED_Y - MIN_SPEED_Y);
+        let speedX = MIN_SPEED_X + Math.random() * (MAX_SPEED_X - MIN_SPEED_X);
+        let x = 64 + Math.random() * (1024 - 128);
+        let y = dy;
+        nextObject(this.leaves, Leaf)
+            .spawn(x, y, (Math.random() * 4) | 0, speedX, speedY);
+    }
+    updateLeaves(state) {
+        const LEAF_TIME = 60;
+        if ((this.leafTimer -= state.step) <= 0) {
+            this.generateLeaf();
+            this.leafTimer += LEAF_TIME;
+        }
+        for (let l of this.leaves) {
+            l.update(state);
+        }
+    }
     update(state) {
-        // ...
+        if (this.hasLeaves) {
+            this.updateLeaves(state);
+        }
     }
     objectCollision(o, state, isEnemy = false) {
         const SIDE_COLLISION_MARGIN = 1024;
@@ -113,6 +156,11 @@ export class Stage {
         if (!this.backgroundLoaded)
             return;
         canvas.drawBitmap(this.background, 0, 0, canvas.width, canvas.height);
+    }
+    postDraw(canvas) {
+        for (let l of this.leaves) {
+            l.draw(canvas);
+        }
     }
     applyScale(canvas) {
         canvas.transform.scale(this.scale, this.scale);
