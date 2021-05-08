@@ -145,8 +145,8 @@ export class CollisionObject extends GameObject {
     wallCollision(x, y, h, dir, state, force = false) {
         const EPS = 0.001;
         const V_MARGIN = 1;
-        const NEAR_MARGIN = 1;
-        const FAR_MARGIN = 4;
+        const NEAR_MARGIN = 4;
+        const FAR_MARGIN = 16;
         if ((!force && this.disableCollisions) ||
             !this.exist || this.dying ||
             this.speed.x * dir < EPS)
@@ -171,8 +171,8 @@ export class CollisionObject extends GameObject {
     }
     slopeCollision(x1, y1, x2, y2, dir, state, force = false) {
         const EPS = 0.001;
-        const NEAR_MARGIN = 8;
-        const FAR_MARGIN = 32;
+        const NEAR_MARGIN = 12;
+        const FAR_MARGIN = 40;
         if ((!force && this.disableCollisions) ||
             !this.exist || this.dying ||
             this.speed.y * dir < EPS ||

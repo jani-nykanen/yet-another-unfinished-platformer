@@ -291,8 +291,8 @@ export abstract class CollisionObject extends GameObject {
 
         const EPS = 0.001;
         const V_MARGIN = 1;
-        const NEAR_MARGIN = 1;
-        const FAR_MARGIN = 4;
+        const NEAR_MARGIN = 4;
+        const FAR_MARGIN = 16;
         
         if ((!force && this.disableCollisions) ||
             !this.exist || this.dying || 
@@ -330,8 +330,8 @@ export abstract class CollisionObject extends GameObject {
         dir : number, state : FrameState, force = false) : boolean {
 
         const EPS = 0.001;
-        const NEAR_MARGIN = 8;
-        const FAR_MARGIN = 32;
+        const NEAR_MARGIN = 12;
+        const FAR_MARGIN = 40;
 
         if ((!force && this.disableCollisions) ||
             !this.exist || this.dying ||

@@ -28,6 +28,8 @@
         {"name": "3", "path": "3.json"},
         {"name": "4", "path": "4.json"},
         {"name": "5", "path": "5.json"},
-        {"name": "6", "path": "6.json"}
+        {"name": "6", "path": "6.json"},
+        {"name": "7", "path": "7.json"},
+        {"name": "8", "path": "8.json"}
     ]
 }
