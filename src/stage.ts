@@ -248,7 +248,7 @@ export class Stage {
 
     public update(state : FrameState) {
 
-        const RAIN_SPEED = [8, 8 * 2.0/3.0];
+        const RAIN_SPEED = [12, 12 * 2.0/3.0];
         const MODULO = [256, 512];
 
         if (this.hasLeaves) {

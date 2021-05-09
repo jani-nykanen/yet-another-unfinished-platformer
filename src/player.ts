@@ -169,7 +169,7 @@ export class Player extends CollisionObject {
 
         const EPS = 0.5;
         const BASE_GRAVITY = 16.0;
-        const BASE_SPEED = 4.0;
+        const BASE_SPEED = 5.0;
         const RUN_SPEED = 8.0;
 
         this.target.zeros();

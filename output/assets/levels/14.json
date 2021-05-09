@@ -1,0 +1,17 @@
+{
+    "image": "assets/levels/14.jpg",
+    "scale": 1.25,
+    "startPos": {"x": 0, "y": 478},
+
+    "rain": true,
+
+    "slopes": [
+
+        {"x1": 0, "y1": 600, "x2": 1024, "y2": 500, "dir": 1}
+    ],
+
+    "walls": [  
+
+        {"x": 705, "y": 0, "h": 768, "dir": 1}
+    ]
+}
