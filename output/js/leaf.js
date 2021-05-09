@@ -10,16 +10,18 @@ export class Leaf extends GameObject {
         this.friction = new Vector2(0.5, 0.5);
         this.exist = false;
     }
-    spawn(x, y, type, speedx, speedy) {
+    spawn(x, y, type, speedx, speedy, bottom, scale = 1.0) {
         this.pos = new Vector2(x, y);
         this.spr.setFrame(type % 2, (type / 2) | 0);
         this.speedFactor = new Vector2(speedx, speedy);
         this.speedAngle = Math.random() * Math.PI * 2;
+        this.scale = scale;
+        this.bottom = bottom;
         this.exist = true;
     }
     updateLogic(state) {
         const ANGLE_SPEED = 0.05;
-        if (this.pos.y > 768 + this.spr.height) {
+        if (this.pos.y > this.bottom + this.spr.height) {
             this.exist = false;
         }
         this.target.y = this.speedFactor.y;
@@ -34,8 +36,9 @@ export class Leaf extends GameObject {
         canvas.transform.push();
         canvas.transform.translate(this.pos.x, this.pos.y);
         canvas.transform.rotate(-this.speed.x / this.speedFactor.x * Math.PI / 4);
+        canvas.transform.scale(this.scale, this.scale);
         canvas.transform.use();
-        canvas.drawSprite(this.spr, bmp, -this.spr.width / 2, -this.spr.height / 2);
+        canvas.drawSprite(this.spr, bmp, -this.spr.width / 2 * this.scale, -this.spr.height / 2 * this.scale);
         canvas.transform.pop();
     }
 }

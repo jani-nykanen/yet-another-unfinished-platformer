@@ -62,8 +62,13 @@ export class Stage {
     private leafTimer : number;
     private hasLeaves : boolean;
 
+    private rainPos : Array<number>;
+    private isRaining : boolean;
+
 
     constructor(objects : ObjectManager, state : FrameState, levelIndex : number) {
+
+        this.rainPos = (new Array<number> (2)).fill(0);
 
         this.slopes = new Array<Line> ();
         this.ladders = new Array<Rect> ();
@@ -76,6 +81,7 @@ export class Stage {
         this.leaves = new Array<Leaf> ();
         this.leafTimer = 0.0;
         this.hasLeaves = false;
+        this.isRaining = false;
 
         this.parseJSON(state.getDocument(String(levelIndex)), objects, state);
 
@@ -168,7 +174,8 @@ export class Stage {
             Number(data["startPos"]["y"]) / this.scale);
 
         this.hasLeaves = data["hasLeaves"] != undefined && Boolean(data["hasLeaves"]);
-            
+        this.isRaining = data["rain"] != undefined && Boolean(data["rain"]);
+        
         if (data["hasInitialLeaves"] != undefined && (data["hasInitialLeaves"])) {
 
             this.generateInitialLeaves();
@@ -202,10 +209,10 @@ export class Stage {
 
     private generateLeaf(dy = -64) {
 
-        const MIN_SPEED_X = 2;
-        const MAX_SPEED_X = 4;
-        const MIN_SPEED_Y = 2;
-        const MAX_SPEED_Y = 6;
+        const MIN_SPEED_X = 3;
+        const MAX_SPEED_X = 6;
+        const MIN_SPEED_Y = 3;
+        const MAX_SPEED_Y = 8;
 
         let speedY = MIN_SPEED_Y + Math.random() * (MAX_SPEED_Y - MIN_SPEED_Y);
         let speedX = MIN_SPEED_X + Math.random() * (MAX_SPEED_X - MIN_SPEED_X);
@@ -213,9 +220,11 @@ export class Stage {
         let x = 64 + Math.random() * (1024 - 128);
         let y = dy;
 
+
         nextObject(this.leaves, Leaf)
             .spawn(x, y, (Math.random() * 4) | 0,
-            speedX, speedY);    
+            speedX * this.scale, speedY * this.scale, 
+            768 / this.scale, this.scale/0.75);    
     }
 
 
@@ -239,9 +248,20 @@ export class Stage {
 
     public update(state : FrameState) {
 
+        const RAIN_SPEED = [8, 8 * 2.0/3.0];
+        const MODULO = [256, 512];
+
         if (this.hasLeaves) {
             
             this.updateLeaves(state);
+        }
+
+         if (this.isRaining){
+
+            for (let i = 0; i < this.rainPos.length; ++ i) {
+
+                this.rainPos[i] = (this.rainPos[i] + RAIN_SPEED[i] * state.step) % MODULO[i];
+            }
         }
     }
 
@@ -311,11 +331,48 @@ export class Stage {
     }
 
 
+    private drawRain(canvas : Canvas) {
+
+        let bmp = canvas.getBitmap("rain");
+
+        canvas.setDrawColor(1, 1, 1, 0.33);
+
+        for (let y = -1; y < Math.floor(canvas.height/256); ++ y) {
+
+            for (let x = 0; x < Math.floor(canvas.width/256)+1; ++ x) {
+
+                canvas.drawBitmapRegion(bmp, 0, 0, 256, 256,
+                    x*256 - this.rainPos[0], y*256 + this.rainPos[0]);
+            }
+        }
+
+
+        for (let y = -2; y < Math.floor(canvas.height/256); ++ y) {
+
+            for (let x = 0; x < Math.floor(canvas.width/256)+1; ++ x) {
+
+                canvas.drawBitmapRegion(bmp, 256, 0, 256, 256,
+                    x*256 - this.rainPos[1]/2, y*256 + this.rainPos[1]);
+            }
+        }
+
+        canvas.setDrawColor();
+    }
+
+
     public postDraw(canvas : Canvas) {
 
-        for (let l of this.leaves) {
+        if (this.hasLeaves) {
 
-            l.draw(canvas);
+            for (let l of this.leaves) {
+
+                l.draw(canvas);
+            }
+        }
+
+        if (this.isRaining) {
+
+            this.drawRain(canvas);
         }
     }
 

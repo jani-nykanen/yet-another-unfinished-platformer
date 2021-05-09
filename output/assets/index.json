@@ -8,6 +8,7 @@
         {"name": "enemies",  "path": "enemies.png"},
         {"name": "poof",  "path": "poof.png"},
         {"name": "leaves",  "path": "leaves.png"},
+        {"name": "rain",  "path": "rain.png"},
         {"name": "font",  "path": "font.png"}
     ],
 
