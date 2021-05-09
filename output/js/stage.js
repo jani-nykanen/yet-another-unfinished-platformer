@@ -108,7 +108,7 @@ export class Stage {
             .spawn(x, y, (Math.random() * 4) | 0, speedX * this.scale, speedY * this.scale, 768 / this.scale, this.scale / 0.75);
     }
     updateLeaves(state) {
-        const LEAF_TIME = 60;
+        const LEAF_TIME = 30;
         if ((this.leafTimer -= state.step) <= 0) {
             this.generateLeaf();
             this.leafTimer += LEAF_TIME;

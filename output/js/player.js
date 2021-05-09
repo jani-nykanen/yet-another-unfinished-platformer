@@ -4,6 +4,7 @@ import { Sprite } from "./core/sprite.js";
 import { Vector2 } from "./core/vector.js";
 import { State } from "./core/types.js";
 import { Dust } from "./dust.js";
+import { clamp } from "./core/mathext.js";
 export class Player extends CollisionObject {
     constructor(x, y) {
         super(x, y);
@@ -73,12 +74,13 @@ export class Player extends CollisionObject {
         const JUMP_TIME = 12;
         const FLAP_TIME = 60;
         const SPEED_BONUS = 2.0;
+        const MAX_FLAP_INITIAL_SPEED = 6.0;
         let jumpState = state.getAction("fire1");
         let canFlapArms = this.jumpMargin <= 0 && !this.flappingArms;
         if ((this.jumpMargin > 0 || canFlapArms) &&
             jumpState == State.Pressed) {
             if (canFlapArms) {
-                this.speed.y = Math.max(this.speed.y, 0);
+                this.speed.y = clamp(this.speed.y, 0, MAX_FLAP_INITIAL_SPEED);
                 this.flappingArms = true;
             }
             this.jumpTimer = this.flappingArms ? FLAP_TIME : JUMP_TIME;

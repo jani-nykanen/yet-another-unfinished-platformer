@@ -82,6 +82,9 @@ export class FrameState {
     public getSample = (name : string) : AudioSample => this.assets.getSample(name);
     public getTilemap = (name : string) : Tilemap => this.assets.getTilemap(name);
     public getDocument = (name : string) : string => this.assets.getDocument(name);
+
+
+    public shake = (shakeAmount : number, shakeTime : number) => this.canvas.shake(shakeAmount, shakeTime);
 }
 
 
@@ -207,6 +210,7 @@ export class Core {
 
                 this.activeScene.update(this.state);
             }
+            this.canvas.update(this.state);
             this.transition.update(this.state);
 
             this.input.postUpdate();

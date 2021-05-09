@@ -13,6 +13,7 @@ export var Flip;
 ;
 export class Canvas {
     constructor(width, height, assets) {
+        this.isShaking = () => this.shakeTimer > 0;
         this.width = width;
         this.height = height;
         this.assets = assets;
@@ -32,6 +33,8 @@ export class Canvas {
         this.whiteFilter = new Bitmap(this.glCtx, null, new Uint8Array([255, 255, 255, 255]), 1, 1);
         this.setFilterTexture(this.whiteFilter);
         this.contrast = 0.0;
+        this.shakeTimer = 0;
+        this.shakeAmount = 0;
     }
     createHtml5Canvas(width, height) {
         let cdiv = document.createElement("div");
@@ -197,5 +200,19 @@ export class Canvas {
     setContrast(constrast) {
         this.activeShader.setContrast(constrast);
         this.contrast = constrast;
+    }
+    update(state) {
+        if (this.shakeTimer > 0) {
+            this.shakeTimer -= state.step;
+        }
+    }
+    shake(shakeAmount, shakeTime) {
+        this.shakeAmount = shakeAmount;
+        this.shakeTimer = shakeTime;
+    }
+    applyShake() {
+        if (this.shakeTimer <= 0)
+            return;
+        this.transform.translate(-this.shakeAmount + Math.random() * this.shakeAmount * 2, -this.shakeAmount + Math.random() * this.shakeAmount * 2);
     }
 }

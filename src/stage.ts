@@ -230,7 +230,7 @@ export class Stage {
 
     private updateLeaves(state : FrameState) {
 
-        const LEAF_TIME = 60;
+        const LEAF_TIME = 30;
 
         if ((this.leafTimer -= state.step) <= 0) {
 
@@ -243,7 +243,6 @@ export class Stage {
             l.update(state);
         }
     }
-
 
 
     public update(state : FrameState) {

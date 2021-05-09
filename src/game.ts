@@ -73,6 +73,17 @@ export class GameScene implements Scene {
         canvas.transform.setView(canvas.width, canvas.height);
         canvas.transform.use();
 
+        if (canvas.isShaking()) {
+
+            canvas.toggleTexturing(false);
+            canvas.setDrawColor();
+            canvas.drawRectangle(0, 0, canvas.width, canvas.height);
+            canvas.toggleTexturing();
+        }
+
+        canvas.applyShake();
+        canvas.transform.use();
+
         if (!this.stage.hasLoaded()) {
 
             canvas.toggleTexturing(false);

@@ -1,5 +1,6 @@
 import { AssetManager } from "./assets.js";
 import { Bitmap } from "./bitmap.js";
+import { FrameState } from "./core.js";
 import { Mesh } from "./mesh.js";
 import { Shader } from "./shader.js";
 import { FragmentSource, VertexSource } from "./shadersource.js";
@@ -38,6 +39,9 @@ export class Canvas {
 
     private contrast : number;
 
+    private shakeTimer : number;
+    private shakeAmount : number;
+
     public readonly transform : Transformations;
 
 
@@ -75,6 +79,9 @@ export class Canvas {
         this.setFilterTexture(this.whiteFilter);
 
         this.contrast = 0.0;
+
+        this.shakeTimer = 0;
+        this.shakeAmount = 0;
     }
 
 
@@ -370,4 +377,33 @@ export class Canvas {
         this.activeShader.setContrast(constrast);
         this.contrast = constrast;
     }
+
+
+    public update(state : FrameState) {
+
+        if (this.shakeTimer > 0) {
+
+            this.shakeTimer -= state.step;
+        }
+    }
+
+
+    public shake(shakeAmount : number, shakeTime : number) {
+
+        this.shakeAmount = shakeAmount;
+        this.shakeTimer = shakeTime;
+    }
+
+
+    public applyShake() {
+
+        if (this.shakeTimer <= 0) return;
+
+        this.transform.translate(
+            -this.shakeAmount + Math.random() * this.shakeAmount * 2, 
+            -this.shakeAmount + Math.random() * this.shakeAmount * 2);
+    }
+
+
+    public isShaking = () : boolean => this.shakeTimer > 0;
 }

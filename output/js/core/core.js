@@ -14,6 +14,7 @@ export class FrameState {
         this.getSample = (name) => this.assets.getSample(name);
         this.getTilemap = (name) => this.assets.getTilemap(name);
         this.getDocument = (name) => this.assets.getDocument(name);
+        this.shake = (shakeAmount, shakeTime) => this.canvas.shake(shakeAmount, shakeTime);
         this.core = core;
         this.step = step;
         this.input = input;
@@ -100,6 +101,7 @@ export class Core {
             if (this.initialized && this.activeScene != null) {
                 this.activeScene.update(this.state);
             }
+            this.canvas.update(this.state);
             this.transition.update(this.state);
             this.input.postUpdate();
             this.timeSum -= FRAME_WAIT;
