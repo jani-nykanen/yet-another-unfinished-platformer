@@ -3,7 +3,7 @@ import { clamp } from "./core/mathext.js";
 import { Vector2 } from "./core/vector.js";
 import { Enemy } from "./enemy.js";
 const ENEMY_TYPES = () => [
-    Snake, Dog, Bird, Cat, Bear, Apple, BigBird
+    Snake, Dog, Bird, Cat, Bear, Apple, BigBird, Rabbit
 ];
 export const getEnemyType = (index) => ENEMY_TYPES()[clamp(index, 0, ENEMY_TYPES().length - 1) | 0];
 export class Snake extends Enemy {
@@ -91,7 +91,7 @@ export class Bird extends Enemy {
 }
 export class Cat extends Enemy {
     constructor(x, y) {
-        super(x, y, 3, 0.90);
+        super(x, y, 3, 0.80);
         this.hitbox = new Vector2(96, 56);
         this.collisionBox = new Vector2(96, 64);
         this.center = new Vector2(0, 48);
@@ -183,7 +183,7 @@ export class Apple extends Enemy {
 }
 export class BigBird extends Enemy {
     constructor(x, y) {
-        super(x, y, 6, 0.90);
+        super(x, y, 6, 0.80);
         this.hitbox = new Vector2(96, 48);
         this.collisionBox = new Vector2(128, 72);
         this.dir = ((x | 0) % 2) == 0 ? 1 : -1;
@@ -198,3 +198,43 @@ export class BigBird extends Enemy {
         this.dir = -dir;
     }
 }
+export class Rabbit extends Enemy {
+    constructor(x, y) {
+        const BASE_GRAVITY = 16.0;
+        super(x, y, 7, 0.80);
+        this.hitbox = new Vector2(64, 64);
+        this.collisionBox = new Vector2(128, 96);
+        this.center = new Vector2(0, 30);
+        this.target.y = BASE_GRAVITY;
+        this.friction.y = 0.35;
+        this.jumpTimer = Rabbit.JUMP_TIME +
+            (Math.floor((x | 0) % 2)) * Rabbit.JUMP_TIME / 2;
+        this.bounceFactor.x = 1;
+    }
+    updateAI(state) {
+        const JUMP_HEIGHT = -10.0;
+        const ANIM_EPS = 1.0;
+        const BASE_SPEED = 3.0;
+        this.target.x = 0.0;
+        if (this.canJump) {
+            if ((this.jumpTimer -= state.step) <= 0) {
+                this.speed.y = JUMP_HEIGHT;
+                this.jumpTimer += Rabbit.JUMP_TIME;
+            }
+        }
+        else {
+            this.target.x = this.dir * BASE_SPEED;
+        }
+        let frame = 0;
+        if (this.speed.y < -ANIM_EPS)
+            frame = 1;
+        else if (this.speed.y > ANIM_EPS)
+            frame = 2;
+        this.spr.setFrame(frame, this.spr.getRow());
+        this.flip = this.dir < 0 ? Flip.None : Flip.Horizontal;
+    }
+    wallCollisionEvent(dir, state) {
+        this.dir = -dir;
+    }
+}
+Rabbit.JUMP_TIME = 30;
