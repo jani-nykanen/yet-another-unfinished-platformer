@@ -1,6 +1,7 @@
 import { Canvas } from "./core/canvas.js";
 import { FrameState, Scene } from "./core/core.js";
 import { TransitionEffectType } from "./core/transition.js";
+import { State } from "./core/types.js";
 import { RGBA } from "./core/vector.js";
 import { ObjectManager } from "./objectmanager.js";
 import { Stage } from "./stage.js";
@@ -12,7 +13,7 @@ export class GameScene implements Scene {
     private objects : ObjectManager;
     private stage : Stage;
 
-    private anyKeyPressed : boolean;
+    private paused : boolean;
 
 
     constructor(param : any, state : FrameState) {
@@ -25,7 +26,7 @@ export class GameScene implements Scene {
 
         this.objects.setInitialState(this.stage);
 
-        this.anyKeyPressed = true; // false;
+        this.paused = false;
     }   
 
 
@@ -37,17 +38,11 @@ export class GameScene implements Scene {
             return;
         }
 
-        if (!this.anyKeyPressed) {
+        if (state.getAction("start") == State.Pressed) {
 
-            if (state.anyInputActionOccurred()) {
-
-                this.anyKeyPressed = true;
-            }
-            else {
-                
-                return;
-            }
+            this.paused = !this.paused;
         }
+        if (this.paused) return;
 
         if (this.objects.update(this.stage, state)) {
 
@@ -62,6 +57,21 @@ export class GameScene implements Scene {
         }
 
         this.stage.update(state);
+    }
+
+
+    private drawPause(canvas : Canvas) {
+
+        canvas.transform.loadIdentity();
+        canvas.transform.use();
+
+        canvas.toggleTexturing(false);
+        canvas.setDrawColor(0, 0, 0, 0.67);
+        canvas.drawRectangle(0, 0, canvas.width, canvas.height);
+        canvas.toggleTexturing(true);
+
+        canvas.drawText(canvas.getBitmap("font"), "GAME PAUSED",
+            canvas.width/2, canvas.height/2 - 32, -28, 0, true);
     }
 
 
@@ -106,6 +116,11 @@ export class GameScene implements Scene {
         canvas.transform.use();
 
         this.stage.postDraw(canvas);
+
+        if (this.paused) {
+
+            this.drawPause(canvas);
+        }
     }
 
 

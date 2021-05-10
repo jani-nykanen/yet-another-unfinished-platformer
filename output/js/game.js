@@ -1,4 +1,5 @@
 import { TransitionEffectType } from "./core/transition.js";
+import { State } from "./core/types.js";
 import { RGBA } from "./core/vector.js";
 import { ObjectManager } from "./objectmanager.js";
 import { Stage } from "./stage.js";
@@ -8,21 +9,18 @@ export class GameScene {
         this.objects = new ObjectManager();
         this.stage = new Stage(this.objects, state, 1);
         this.objects.setInitialState(this.stage);
-        this.anyKeyPressed = true; // false;
+        this.paused = false;
     }
     update(state) {
         if (state.transition.isActive()) {
             this.objects.transitionUpdate(state);
             return;
         }
-        if (!this.anyKeyPressed) {
-            if (state.anyInputActionOccurred()) {
-                this.anyKeyPressed = true;
-            }
-            else {
-                return;
-            }
+        if (state.getAction("start") == State.Pressed) {
+            this.paused = !this.paused;
         }
+        if (this.paused)
+            return;
         if (this.objects.update(this.stage, state)) {
             state.transition.activate(true, TransitionEffectType.Fade, 1.0 / 30.0, state => {
                 this.objects.resetEnemyArray();
@@ -31,6 +29,15 @@ export class GameScene {
             }, new RGBA(1, 1, 1));
         }
         this.stage.update(state);
+    }
+    drawPause(canvas) {
+        canvas.transform.loadIdentity();
+        canvas.transform.use();
+        canvas.toggleTexturing(false);
+        canvas.setDrawColor(0, 0, 0, 0.67);
+        canvas.drawRectangle(0, 0, canvas.width, canvas.height);
+        canvas.toggleTexturing(true);
+        canvas.drawText(canvas.getBitmap("font"), "GAME PAUSED", canvas.width / 2, canvas.height / 2 - 32, -28, 0, true);
     }
     redraw(canvas) {
         canvas.clear();
@@ -60,6 +67,9 @@ export class GameScene {
         canvas.transform.loadIdentity();
         canvas.transform.use();
         this.stage.postDraw(canvas);
+        if (this.paused) {
+            this.drawPause(canvas);
+        }
     }
     dispose() {
         return null;

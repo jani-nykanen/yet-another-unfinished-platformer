@@ -96,6 +96,8 @@ export class Cat extends Enemy {
         this.collisionBox = new Vector2(96, 64);
         this.center = new Vector2(0, 48);
         this.friction.x = 0.5;
+        this.dir = ((x | 0) % 2 == 0) ? 1 : -1;
+        this.flip = this.dir > 0 ? Flip.Horizontal : Flip.None;
     }
     updateAI(state) {
         const BASE_GRAVITY = 12.0;
@@ -184,15 +186,28 @@ export class Apple extends Enemy {
 export class BigBird extends Enemy {
     constructor(x, y) {
         super(x, y, 6, 0.80);
-        this.hitbox = new Vector2(96, 48);
+        this.hitbox = new Vector2(80, 48);
         this.collisionBox = new Vector2(128, 72);
         this.dir = ((x | 0) % 2) == 0 ? 1 : -1;
+        this.flip = this.dir > 0 ? Flip.Horizontal : Flip.None;
+        this.startPos = y;
+        this.waveTimer = 0.0;
     }
     updateAI(state) {
+        const WAVE_SPEED = 0.1667;
         const FLY_SPEED = 3.0;
-        this.spr.animate(this.spr.getRow(), 0, 3, 6, state.step);
-        this.flip = this.dir > 0 ? Flip.Horizontal : Flip.None;
+        const AMPLITUDE = 24.0;
+        const EPS = 16.0;
         this.speed.x = FLY_SPEED * this.dir;
+        this.waveTimer = (this.waveTimer + WAVE_SPEED * state.step) % (Math.PI * 2);
+        this.pos.y = this.startPos + Math.sin(this.waveTimer) * AMPLITUDE;
+        let frame = 0;
+        if (this.waveTimer >= Math.PI / 4 && this.waveTimer < Math.PI - Math.PI / 4)
+            frame = 1;
+        else if (this.waveTimer >= Math.PI + Math.PI / 4 && this.waveTimer < Math.PI * 2 - Math.PI / 4)
+            frame = 3;
+        this.spr.setFrame(frame, this.spr.getRow());
+        this.flip = this.dir > 0 ? Flip.Horizontal : Flip.None;
     }
     wallCollisionEvent(dir, state) {
         this.dir = -dir;

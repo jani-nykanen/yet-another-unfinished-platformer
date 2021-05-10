@@ -12,7 +12,7 @@ export class Player extends CollisionObject {
         this.respawning = true;
         this.respawnType = 1;
         this.friction = new Vector2(0.40, 0.75);
-        this.hitbox = new Vector2(80, 160);
+        this.hitbox = new Vector2(80, 144);
         this.collisionBox = new Vector2(80, 160);
         this.center = new Vector2(0, 16);
         this.canJump = false;
@@ -197,6 +197,8 @@ export class Player extends CollisionObject {
         this.flip = Flip.None;
     }
     updateLogic(state) {
+        const HITBOX_Y_BASE = 160;
+        const HITBOX_Y_CROUCH = 64;
         if (this.respawning) {
             this.updateRespawning(state);
             return;
@@ -205,6 +207,7 @@ export class Player extends CollisionObject {
         this.animate(state);
         this.updateTimers(state);
         this.updateDust(state);
+        this.hitbox.y = this.crouching ? HITBOX_Y_CROUCH : HITBOX_Y_BASE;
         this.canJump = false;
         this.touchLadder = false;
         this.isLadderTop = false;
