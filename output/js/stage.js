@@ -1,6 +1,12 @@
 import { Rect, Vector2 } from "./core/vector.js";
 import { nextObject } from "./gameobject.js";
 import { Leaf } from "./leaf.js";
+const HINTS = [
+    "USE LEFT AND RIGHT ARROW KEYS TO MOVE",
+    "PRESS LEFT SHIFT TO RUN AND SPACE TO JUMP",
+    "USE UP AND DOWN ARROW KEYS TO CLIMB",
+    "PRESS THE JUMP BUTTON TWICE TO FLAP ARMS"
+];
 class Line {
     constructor(x1, y1, x2, y2, dir) {
         this.A = new Vector2(x1, y1);
@@ -30,6 +36,7 @@ export class Stage {
         this.leafTimer = 0.0;
         this.hasLeaves = false;
         this.isRaining = false;
+        this.hintAlphaFactor = 1.0;
         this.parseJSON(state.getDocument(String(levelIndex)), objects, state);
         this.stageIndex = levelIndex;
     }
@@ -120,6 +127,7 @@ export class Stage {
     update(state) {
         const RAIN_SPEED = [12, 12 * 2.0 / 3.0];
         const MODULO = [256, 512];
+        const HINT_FACTOR_SPEED = 0.05;
         if (this.hasLeaves) {
             this.updateLeaves(state);
         }
@@ -128,6 +136,8 @@ export class Stage {
                 this.rainPos[i] = (this.rainPos[i] + RAIN_SPEED[i] * state.step) % MODULO[i];
             }
         }
+        this.hintAlphaFactor = (this.hintAlphaFactor +
+            HINT_FACTOR_SPEED * state.step) % (Math.PI * 2);
     }
     objectCollision(o, state, isEnemy = false) {
         const SIDE_COLLISION_MARGIN = 1024;
@@ -182,6 +192,14 @@ export class Stage {
         }
         canvas.setDrawColor();
     }
+    drawHints(canvas) {
+        let bmp = canvas.getBitmap("font");
+        let alpha = 0.75 + 0.25 * Math.sin(this.hintAlphaFactor);
+        let scale = 0.657 + 0.001 * Math.sin(this.hintAlphaFactor);
+        canvas.setDrawColor(1, 1, 1, alpha);
+        canvas.drawText(bmp, HINTS[this.stageIndex - 1], canvas.width / 2, canvas.height - 48, -28, 0, true, scale, scale);
+        canvas.setDrawColor();
+    }
     postDraw(canvas) {
         if (this.hasLeaves) {
             for (let l of this.leaves) {
@@ -190,6 +208,9 @@ export class Stage {
         }
         if (this.isRaining) {
             this.drawRain(canvas);
+        }
+        if (this.stageIndex <= HINTS.length) {
+            this.drawHints(canvas);
         }
     }
     applyScale(canvas) {

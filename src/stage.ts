@@ -8,6 +8,15 @@ import { ObjectManager } from "./objectmanager.js";
 
 
 
+const HINTS = [
+    "USE LEFT AND RIGHT ARROW KEYS TO MOVE",
+    "PRESS LEFT SHIFT TO RUN AND SPACE TO JUMP",
+    "USE UP AND DOWN ARROW KEYS TO CLIMB",
+    "PRESS THE JUMP BUTTON TWICE TO FLAP ARMS"
+];
+
+
+
 class Line {
 
     public A : Vector2;
@@ -65,6 +74,8 @@ export class Stage {
     private rainPos : Array<number>;
     private isRaining : boolean;
 
+    private hintAlphaFactor : number;
+
 
     constructor(objects : ObjectManager, state : FrameState, levelIndex : number) {
 
@@ -82,6 +93,8 @@ export class Stage {
         this.leafTimer = 0.0;
         this.hasLeaves = false;
         this.isRaining = false;
+
+        this.hintAlphaFactor = 1.0;
 
         this.parseJSON(state.getDocument(String(levelIndex)), objects, state);
 
@@ -249,6 +262,7 @@ export class Stage {
 
         const RAIN_SPEED = [12, 12 * 2.0/3.0];
         const MODULO = [256, 512];
+        const HINT_FACTOR_SPEED = 0.05;
 
         if (this.hasLeaves) {
             
@@ -262,6 +276,9 @@ export class Stage {
                 this.rainPos[i] = (this.rainPos[i] + RAIN_SPEED[i] * state.step) % MODULO[i];
             }
         }
+
+        this.hintAlphaFactor = (this.hintAlphaFactor +
+            HINT_FACTOR_SPEED * state.step) % (Math.PI*2);
     }
 
 
@@ -359,6 +376,20 @@ export class Stage {
     }
 
 
+    private drawHints(canvas : Canvas) {
+
+        let bmp = canvas.getBitmap("font");
+
+        let alpha = 0.75 + 0.25 * Math.sin(this.hintAlphaFactor);
+        let scale = 0.657 + 0.001 * Math.sin(this.hintAlphaFactor);
+
+        canvas.setDrawColor(1, 1, 1, alpha);
+        canvas.drawText(bmp, HINTS[this.stageIndex-1],
+            canvas.width/2, canvas.height-48, -28, 0, true, scale, scale);
+        canvas.setDrawColor();
+    }
+
+
     public postDraw(canvas : Canvas) {
 
         if (this.hasLeaves) {
@@ -372,6 +403,11 @@ export class Stage {
         if (this.isRaining) {
 
             this.drawRain(canvas);
+        }
+
+        if (this.stageIndex <= HINTS.length) {
+
+            this.drawHints(canvas);
         }
     }
 
