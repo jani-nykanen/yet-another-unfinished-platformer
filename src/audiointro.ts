@@ -33,8 +33,6 @@ export class AudioIntro implements Scene {
             // state.audio.playSample(state.getSample("select"), 0.50);
 
             state.changeScene(GameScene);
-            state.transition.activate(false, TransitionEffectType.Fade,
-                1.0/30.0, null, new RGBA(128, 128, 128));
         }
     }
 

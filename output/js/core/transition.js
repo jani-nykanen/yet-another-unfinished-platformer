@@ -3,9 +3,6 @@ export var TransitionEffectType;
 (function (TransitionEffectType) {
     TransitionEffectType[TransitionEffectType["None"] = 0] = "None";
     TransitionEffectType[TransitionEffectType["Fade"] = 1] = "Fade";
-    TransitionEffectType[TransitionEffectType["CirleIn"] = 2] = "CirleIn";
-    TransitionEffectType[TransitionEffectType["BoxVertical"] = 3] = "BoxVertical";
-    TransitionEffectType[TransitionEffectType["BoxHorizontal"] = 4] = "BoxHorizontal";
 })(TransitionEffectType || (TransitionEffectType = {}));
 export class TransitionEffectManager {
     constructor() {
@@ -27,6 +24,7 @@ export class TransitionEffectManager {
         this.effectType = type;
         this.color = color.clone();
         this.active = true;
+        this.wait = false;
         return this;
     }
     toggleWaiting(state) {

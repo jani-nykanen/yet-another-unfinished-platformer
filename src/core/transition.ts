@@ -7,9 +7,6 @@ export enum TransitionEffectType {
 
     None = 0,
     Fade = 1,
-    CirleIn = 2,
-    BoxVertical = 3,
-    BoxHorizontal = 4,
 }
 
 
@@ -52,6 +49,7 @@ export class TransitionEffectManager {
         this.color = color.clone();
 
         this.active = true;
+        this.wait = false;
 
         return this;
     }
@@ -61,7 +59,6 @@ export class TransitionEffectManager {
 
         this.wait = state;
     }
-
 
 
     public update(ev : FrameState) {

@@ -1,6 +1,4 @@
-import { TransitionEffectType } from "./core/transition.js";
 import { State } from "./core/types.js";
-import { RGBA } from "./core/vector.js";
 import { GameScene } from "./game.js";
 export class AudioIntro {
     constructor(params, state) {
@@ -15,7 +13,6 @@ export class AudioIntro {
             state.audio.toggle(this.cursorPos == 0);
             // state.audio.playSample(state.getSample("select"), 0.50);
             state.changeScene(GameScene);
-            state.transition.activate(false, TransitionEffectType.Fade, 1.0 / 30.0, null, new RGBA(128, 128, 128));
         }
     }
     redraw(canvas) {

@@ -20,6 +20,7 @@ export class GameScene implements Scene {
 
         state.transition.activate(false, TransitionEffectType.Fade,
             1.0/30.0, null, new RGBA(1, 1, 1));
+        state.transition.toggleWaiting(true);
 
         this.objects = new ObjectManager();
         this.stage = new Stage(this.objects, state, 1);
