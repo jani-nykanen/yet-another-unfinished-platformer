@@ -375,7 +375,7 @@ export class Player extends CollisionObject {
         this.speed.x = MOVE_SPEED;
         this.pos.x += this.speed.x * state.step;
 
-        this.startPos = this.pos.clone();
+        this.startPos.x = this.pos.x;
     }
 
 
