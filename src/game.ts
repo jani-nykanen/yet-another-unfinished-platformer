@@ -51,6 +51,8 @@ export class GameScene implements Scene {
             state.transition.activate(true, TransitionEffectType.Fade,
                 1.0 / 30.0, state => {
 
+                    state.transition.toggleWaiting(true);
+
                     this.objects.resetEnemyArray();
                     this.stage.nextStage(this.objects, state);
                     this.objects.setInitialState(this.stage);

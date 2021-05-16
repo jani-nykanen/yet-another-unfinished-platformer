@@ -21,8 +21,8 @@ export class TransitionEffectManager {
     private effectType : TransitionEffectType;
     private color : RGBA;
     private active : boolean;
-    private center : Vector2;
     private speed : number;
+    private wait : boolean;
     
     private callback : ((state : FrameState) => void);
 
@@ -34,8 +34,8 @@ export class TransitionEffectManager {
         this.effectType = TransitionEffectType.None;
         this.color = new RGBA();
         this.active = false;
-        this.center = new Vector2(80, 72);
         this.speed = 1;
+        this.wait = false;
 
         this.callback = ev => {};
     }
@@ -57,16 +57,16 @@ export class TransitionEffectManager {
     }
 
 
-    public setCenter(pos : Vector2) : TransitionEffectManager {
+    public toggleWaiting(state : boolean) {
 
-        this.center = pos.clone();
-        return this;
+        this.wait = state;
     }
+
 
 
     public update(ev : FrameState) {
 
-        if (!this.active) return;
+        if (!this.active || this.wait) return;
 
         if ((this.timer -= this.speed * ev.step) <= 0) {
 

@@ -1,4 +1,4 @@
-import { RGBA, Vector2 } from "./vector.js";
+import { RGBA } from "./vector.js";
 export var TransitionEffectType;
 (function (TransitionEffectType) {
     TransitionEffectType[TransitionEffectType["None"] = 0] = "None";
@@ -15,8 +15,8 @@ export class TransitionEffectManager {
         this.effectType = TransitionEffectType.None;
         this.color = new RGBA();
         this.active = false;
-        this.center = new Vector2(80, 72);
         this.speed = 1;
+        this.wait = false;
         this.callback = ev => { };
     }
     activate(fadeIn, type, speed, callback, color = new RGBA()) {
@@ -29,12 +29,11 @@ export class TransitionEffectManager {
         this.active = true;
         return this;
     }
-    setCenter(pos) {
-        this.center = pos.clone();
-        return this;
+    toggleWaiting(state) {
+        this.wait = state;
     }
     update(ev) {
-        if (!this.active)
+        if (!this.active || this.wait)
             return;
         if ((this.timer -= this.speed * ev.step) <= 0) {
             this.fadeIn = !this.fadeIn;

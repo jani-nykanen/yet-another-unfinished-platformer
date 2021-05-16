@@ -141,6 +141,8 @@ export class Stage {
                 this.backgroundBuffer.destroy();
                 this.backgroundBuffer = null;
             }
+
+            state.transition.toggleWaiting(false);
         });
 
         this.scale = Number(data["scale"]);
