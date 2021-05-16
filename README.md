@@ -12,5 +12,18 @@ Run `make js`.
 
 -----
 
+## Copyright notes
+
+All the code and graphics assets were done by me, but some CC0 licensed audio samples from freesound.org were used to create the background audio. Unfortunately I did not remember to write down the name of those samples. Sorry.
+
+
+-----
+
+## License
+
+Do what you want with the code, I don't care.
+
+-----
+
 
 (c) 2021 Jani Nykänen
