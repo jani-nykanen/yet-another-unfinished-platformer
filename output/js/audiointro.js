@@ -35,5 +35,6 @@ export class AudioIntro {
             str = " YES\n@NO";
         }
         canvas.drawText(bmpFont, str, 256, 400, -26, -4, false, 1, 1);
+        canvas.drawText(bmpFont, "V. 0.5.0C", 2, 768 - 32, -26, -4, false, 0.5, 0.5);
     }
 }
