@@ -9,7 +9,8 @@ export class AudioIntro {
         if (state.downPress() || state.upPress()) {
             this.cursorPos = Number(!Boolean(this.cursorPos));
         }
-        if (state.getAction("start") == State.Pressed) {
+        if (state.getAction("start") == State.Pressed ||
+            state.getAction("fire1") == State.Pressed) {
             state.audio.toggle(this.cursorPos == 0);
             // state.audio.playSample(state.getSample("select"), 0.50);
             state.changeScene(GameScene);
