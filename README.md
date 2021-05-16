@@ -2,7 +2,7 @@
 
 ...with hand-drawn art & animation!
 
-### [Play here](jani-nykanen.github.io/yet-another-unfinished-platformer/output.html)
+### [Play here](jani-nykanen.github.io/yet-another-unfinished-platformer/output/index.html)
 
 -----
 
