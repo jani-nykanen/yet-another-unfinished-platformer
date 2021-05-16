@@ -1,7 +1,7 @@
 {
     "image": "assets/levels/11.jpg",
     "scale": 0.75,
-    "startPos": {"x": 0, "y": 600},
+    "startPos": {"x": 0, "y": 580},
 
     "rain": true,
 
