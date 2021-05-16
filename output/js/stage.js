@@ -56,15 +56,13 @@ export class Stage {
         this.walls = new Array();
         this.enemyWalls = new Array();
         state.loadBitmap(data["image"], bmp => {
-            window.setTimeout(() => {
-                this.background = bmp;
-                this.backgroundLoaded = true;
-                if (destroyOldBackground) {
-                    this.backgroundBuffer.destroy();
-                    this.backgroundBuffer = null;
-                }
-                state.transition.toggleWaiting(false);
-            }, 1000);
+            this.background = bmp;
+            this.backgroundLoaded = true;
+            if (destroyOldBackground) {
+                this.backgroundBuffer.destroy();
+                this.backgroundBuffer = null;
+            }
+            state.transition.toggleWaiting(false);
         });
         this.scale = Number(data["scale"]);
         if (data["slopes"] != undefined) {
