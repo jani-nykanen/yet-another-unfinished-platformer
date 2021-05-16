@@ -12,9 +12,10 @@
         {"name": "font",  "path": "font.png"}
     ],
 
-    "samplePath" : "assets/samples/",
+    "samplePath" : "assets/audio/",
     "samples" : [
 
+        {"name": "noise1",  "path": "noise1.ogg"}
     ],
 
     "tilemapPath" : "assets/tilemaps/",

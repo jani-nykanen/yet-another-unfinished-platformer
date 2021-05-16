@@ -10,6 +10,7 @@ export class GameScene {
         this.stage = new Stage(this.objects, state, 1);
         this.objects.setInitialState(this.stage);
         this.paused = false;
+        state.audio.fadeInMusic(state.getSample("noise1"), 0.40, 1000);
     }
     update(state) {
         if (state.transition.isActive()) {

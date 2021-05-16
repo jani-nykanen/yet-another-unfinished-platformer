@@ -227,7 +227,7 @@ export class Player extends CollisionObject {
         this.target.x = MOVE_SPEED;
         this.speed.x = MOVE_SPEED;
         this.pos.x += this.speed.x * state.step;
-        this.startPos.x = this.pos.x;
+        this.startPos = this.pos.clone();
     }
     preDraw(canvas) {
         for (let d of this.dust) {

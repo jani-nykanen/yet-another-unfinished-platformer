@@ -27,6 +27,8 @@ export class GameScene implements Scene {
         this.objects.setInitialState(this.stage);
 
         this.paused = false;
+
+        state.audio.fadeInMusic(state.getSample("noise1"), 0.40, 1000);
     }   
 
 
